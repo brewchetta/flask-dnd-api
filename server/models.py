@@ -186,8 +186,8 @@ class MonsterLanguage(db.Model):
 # DAMAGE TYPE #########################################
 # Example: DamageType(name="cold")
 # 
-# Resistance, immunity, vulnerability are joins b/w
-# Monster and DamageType
+# DamageResistance, DamageImmunity, DamageVulnerability 
+# are joins b/w Monster and DamageType
 # ####################################################
 
 class DamageType(db.Model):
@@ -216,6 +216,26 @@ class DamageVulnerability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+
+
+# CONDITION TYPE ######################################
+# Example: ConditionType(name="charmed")
+# 
+# ConditionImmunity is join b/w Monster and ConditionType
+# ####################################################
+
+class ConditionType(db.Model):
+    __tablename__ = "condition_types_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+class ConditionImmunity(db.Model):
+    __tablename__ = "condition_immunities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    condition_type_id = db.Column(db.Integer, db.ForeignKey("condition_types_table.id"))
 
 
 # CHARACTER ACTION ####################################
