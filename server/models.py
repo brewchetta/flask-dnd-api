@@ -10,6 +10,15 @@ metadata = MetaData(naming_convention={
 db = SQLAlchemy(metadata=metadata)
 
 # MONSTER #############################################
+# Relationships:
+#     belongs to monster_category
+#     many skills through skill_values
+#     many saving_throws through saving_throw_values
+#     many special_abilities
+#     many senses through monster_senses
+#     many languages through monster_languages
+#     many actions
+#     many spells through monster_spells
 # ####################################################
 
 class Monster(db.Model):
@@ -18,6 +27,8 @@ class Monster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     monster_category_id = db.Column(db.Integer, db.ForeignKey("monster_categories_table.id"))
+    monster_category = db.relationship("MonsterCategory", back_populates="monsters")
+
 
     name = db.Column(db.String, nullable=False)
     size = db.Column(db.String, default="medium")
@@ -57,16 +68,19 @@ class Monster(db.Model):
 # Examples: humanoid, construct, infernal, etc.
 # ####################################################
 
-class CharacterCategory(db.Model):
+class MonsterCategory(db.Model):
     __tablename__ = "monster_categories_table"
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+    monsters = db.relationship("Monster", back_populates="monster_category")
+
 
 # CHARACTER SKILL #####################################
 # a +2 to History would have Skill(name="history")
 # and SkillValue(value="2") along with foreign keys
 # ####################################################
-    
 
 class Skill(db.Model):
     __tablename__ = "skills_table"
@@ -79,8 +93,13 @@ class SkillValue(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Integer, default=0)
+
     skill_id = db.Column(db.Integer, db.ForeignKey("skills_table.id"))
+    skill = db.relationship("Skill", back_populates="skill_values")
+
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="skill_values")
+
 
 # CHARACTER SAVING THROW ##############################
 # ####################################################
@@ -97,13 +116,17 @@ class SavingThrowValue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String)
     saving_throw_id = db.Column(db.Integer, db.ForeignKey("saving_throws_table.id"))
+    saving_throw = db.relationship("SavingThrow", back_populates="saving_throw_values")
+
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="skill_values")
+
 
 # CHARACTER SPECIAL ABILITY ###########################
 # Example: SpecialAbility(name="Amphibious", 
-# description="The monster can breath water and air")
+# description="The Aboleth can breath water and air")
 # 
-# MonsterSpecialAbility exists only as join table
+# belongs to monster
 # ####################################################
 
 class SpecialAbility(db.Model):
@@ -113,12 +136,9 @@ class SpecialAbility(db.Model):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
 
-class MonsterSpecialAbility(db.Model):
-    __tablename__ = "monster_special_abilities_table"
-
-    id = db.Column(db.Integer, primary_key=True)
-    special_ability_id = db.Column(db.Integer, db.ForeignKey("special_abilities_table.id"))
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="skill_values")
+
 
 # CHARACTER SENSE #####################################
 # Example: Sense(name="darkvision")
@@ -162,6 +182,42 @@ class MonsterLanguage(db.Model):
     language_id = db.Column(db.Integer, db.ForeignKey("languages_table.id"))
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 
+
+# DAMAGE TYPE #########################################
+# Example: DamageType(name="cold")
+# 
+# Resistance, immunity, vulnerability are joins b/w
+# Monster and DamageType
+# ####################################################
+
+class DamageType(db.Model):
+    __tablename__ = "damage_types_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+class DamageResistance(db.Model):
+    __tablename__ = "damage_resistances_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+
+class DamageImmunity(db.Model):
+    __tablename__ = "damage_immunities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+
+class DamageVulnerability(db.Model):
+    __tablename__ = "damage_vulnerabilities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+
+
 # CHARACTER ACTION ####################################
 # Example: Action(name="Club", description="Melee Weapon Attack: +2 to hit, reach 5ft., one target. Hit: 2 (1d4) bludgeoning damage.")
 # 
@@ -177,6 +233,7 @@ class Action(db.Model):
     lair = db.Column(db.Boolean, default=False)
     name = db.Column(db.String)
     description = db.Column(db.String, nullable=False)
+
 
 # CHARACTER SPELL #####################################
 # Example: Spell()
@@ -207,5 +264,9 @@ class MonsterSpell(db.Model):
     __tablename__ = "monster_spells_table"
 
     id = db.Column(db.Integer, primary_key=True)
+
     spell_id = db.Column(db.Integer, db.ForeignKey("spells_table.id"))
+    spell = db.relationship("Spell", back_populates="monster_spells")
+
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="monster_spells")
