@@ -69,7 +69,7 @@ class TestRoutes:
 
         print(app.config['SQLALCHEMY_DATABASE_URI'])
 
-        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO)])
+        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
         db.session.commit()
 
         res = app.test_client().get('/monsters')
@@ -87,6 +87,44 @@ class TestRoutes:
             'name': 'Test Monster',
             'size': 'medium',
             'category': 'humanoid',
+        }
+
+        res = app.test_client().post( '/monsters', json=MONSTER_DICT )
+        assert res.status_code == 201
+
+        res_data = res.json
+        assert res_data['id']
+        assert res_data['name'] == 'Test Monster'
+
+        monster = Monster.query.where( Monster.name == 'Test Monster' ).first()
+        assert monster
+
+    def test_post_monster_returns_error_if_invalid(self):
+        """ <POST /monsters> creates and returns an error response if invalid """
+
+        MONSTER_DICT = {
+            'name': 'Test Monster',
+            'size': 'lorge',
+            'category': 'bitumenoid',
+        }
+
+        res = app.test_client().post( '/monsters', json=MONSTER_DICT )
+        assert res.status_code == 406
+
+        res_data = res.json
+        assert res_data['error']
+
+        monster = Monster.query.where( Monster.name == 'Test Monster' ).first()
+        assert not monster
+
+    def test_post_monster_ignores_unused_keys(self):
+        """ <POST /monsters> creates and returns a monster and ignores invalid keys """
+
+        MONSTER_DICT = {
+            'name': 'Test Monster',
+            'size': 'medium',
+            'category': 'humanoid',
+            'thacko': True
         }
 
         res = app.test_client().post( '/monsters', json=MONSTER_DICT )

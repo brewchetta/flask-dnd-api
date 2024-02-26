@@ -33,5 +33,20 @@ def get_monsters():
     return [ m.to_dict() for m in monsters ]
 
 
+# POST MONSTER #########
+#######################
+@app.post('/monsters')
+def post_monster():
+    data = request.json
+    filtered_data = { k: v for k, v in data.items() if k in dir(Monster) and '__' not in k }
+    try:
+        NEW_M = Monster(**filtered_data)
+        db.session.add(NEW_M)
+        db.session.commit()
+        return NEW_M.to_dict(), 201
+    except ValueError as e:
+        return { "error": f"An error occurred: {e}" }, 406
+
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
