@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy_serializer import SerializerMixin
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -20,7 +21,7 @@ db = SQLAlchemy(metadata=metadata)
 #     many spells through monster_spells
 # ####################################################
 
-class Monster(db.Model):
+class Monster(db.Model, SerializerMixin):
 
     CATEGORIES = ["aberration", "beast", "celestial", "construct", "dragon", "elemental", "fey", "fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"]
 
@@ -34,6 +35,7 @@ class Monster(db.Model):
     size = db.Column(db.String, default="medium")
 
     category = db.Column(db.String)
+    sub_category = db.Column(db.String)
 
     armor_class = db.Column(db.Integer, default=10)
     hit_points = db.Column(db.Integer, default=1)
@@ -50,7 +52,7 @@ class Monster(db.Model):
     challenge_rating = db.Column(db.Integer, default=0)
     proficiency_bonus = db.Column(db.Integer, default=2)
 
-    spellcasting_level = db.Column(db.Integer)
+    spellcasting_level = db.Column(db.Integer, default=0)
     spellcasting_ability = db.Column(db.String)
     spell_save_dc = db.Column(db.Integer, default=0)
     spell_modifier = db.Column(db.Integer, default=0)
@@ -74,16 +76,22 @@ class Monster(db.Model):
         raise ValueError(f"{k} must be a valid monster category ('aberration', 'beast', 'celestial', 'construct', 'dragon', 'elemental', 'fey', 'fiend', 'giant', 'humanoid', 'monstrosity', 'ooze', 'plant', 'undead') but you put {v}")
 
     @validates("strength", "dexterity", "constitution", "wisdom", "charisma")
-    def validate_attributes(self, k, v):
+    def validate_abilities(self, k, v):
         if 0 <= v <= 30:
             return v
         raise ValueError(f"{k} must be between 0 and 30 inclusive but received {v}")
 
-    @validates("armor_class", "hit_points", "hit_dict_count", "hit_dict_size")
+    @validates("armor_class", "hit_points", "hit_dice_count", "challenge_rating", "proficiency_bonus")
     def validate_non_zero_stats(self, k, v):
         if v > 0:
             return v
         raise ValueError(f"{k} must be 1 or greater but received {v}")
+    
+    @validates("hit_dice_size")
+    def validate_dice_values(self, k, v):
+        if v == 4 or v == 6 or v == 8 or v == 10 or v == 12:
+            return v
+        raise ValueError(f"{k} must be a valid size (4, 6, 8, 10, 12) but received {v}")
     
 # END Monster #
 
@@ -92,7 +100,7 @@ class Monster(db.Model):
 # # Example: Skill(value="2", name="history")
 # # ####################################################
 
-# class Skill(db.Model):
+# class Skill(db.Model, SerializerMixin):
 #     __tablename__ = "skills_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
@@ -110,7 +118,7 @@ class Monster(db.Model):
 # # Example: SavingThrow(value="2", name="dexterity")
 # # ####################################################
 
-# class SavingThrow(db.Model):
+# class SavingThrow(db.Model, SerializerMixin):
 #     __tablename__ = "saving_throws_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
@@ -130,7 +138,7 @@ class Monster(db.Model):
 # # belongs to monster
 # # ####################################################
 
-# class SpecialAbility(db.Model):
+# class SpecialAbility(db.Model, SerializerMixin):
 #     __tablename__ = "special_abilities_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
@@ -147,7 +155,7 @@ class Monster(db.Model):
 # # Example: Sense(name="passive perception", passive_score=12)
 # # ####################################################
 
-# class Sense(db.Model):
+# class Sense(db.Model, SerializerMixin):
 #     __tablename__ = "senses_table"
 
 #     id = db.Column(db.Integer, primary_key=True)

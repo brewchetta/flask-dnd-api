@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from models import db # import your models here!
+from models import db, Monster
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -29,7 +29,7 @@ def get_monsters():
     PER_PAGE = request.args.get('per_page') or 10
     OFFSET = (PAGE - 1) * PER_PAGE
 
-    monsters = Monsters.query.limit(PER_PAGE).offset(OFFSET).all()
+    monsters = Monster.query.limit(PER_PAGE).offset(OFFSET).all()
     return [ m.to_dict() for m in monsters ]
 
 
