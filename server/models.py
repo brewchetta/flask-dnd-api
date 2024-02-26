@@ -11,20 +11,22 @@ db = SQLAlchemy(metadata=metadata)
 
 # MONSTER #############################################
 # Relationships:
-#     belongs to monster_category
-#     many skills through skill_values
-#     many saving_throws through saving_throw_values
+#     many skills
+#     many saving_throws
 #     many special_abilities
-#     many senses through monster_senses
-#     many languages through monster_languages
+#     many senses
+#     many languages
 #     many actions
 #     many spells through monster_spells
 # ####################################################
 
 class Monster(db.Model):
+
     CATEGORIES = ["aberration", "beast", "celestial", "construct", "dragon", "elemental", "fey", "fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"]
 
     __tablename__ = "monsters_table"
+
+    # COLUMNS #
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -63,6 +65,8 @@ class Monster(db.Model):
     spell_slots_eighth_level = db.Column(db.Integer, default=0)
     spell_slots_ninth_level = db.Column(db.Integer, default=0)
 
+    # VALIDATIONS #
+
     @validates("category")
     def validate_category(self, k, v):
         if v.lower() in self.CATEGORIES:
@@ -80,33 +84,30 @@ class Monster(db.Model):
         if v > 0:
             return v
         raise ValueError(f"{k} must be 1 or greater but received {v}")
+    
+# END Monster #
 
 
 # # CHARACTER SKILL #####################################
-# # a +2 to History would have Skill(name="history")
-# # and SkillValue(value="2") along with foreign keys
+# # Example: Skill(value="2", name="history")
 # # ####################################################
 
 # class Skill(db.Model):
 #     __tablename__ = "skills_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-
-# class SkillValue(db.Model):
-#     __tablename__ = "skill_values_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
 #     value = db.Column(db.Integer, default=0)
-
-#     skill_id = db.Column(db.Integer, db.ForeignKey("skills_table.id"))
-#     skill = db.relationship("Skill", back_populates="skill_values")
+#     name = db.Column(db.String, nullable=False)
 
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     monster = db.relationship("Monster", back_populates="skill_values")
+    
+# # TODO: Add validations for skill names
 
 
 # # CHARACTER SAVING THROW ##############################
+# # Example: SavingThrow(value="2", name="dex")
+# # Example: SavingThrow(value="2", name="dexterity")
 # # ####################################################
 
 # class SavingThrow(db.Model):
@@ -114,18 +115,13 @@ class Monster(db.Model):
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String)
-
-# class SavingThrowValue(db.Model):
-#     __tablename__ = "saving_throw_values_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
 #     value = db.Column(db.String)
-#     saving_throw_id = db.Column(db.Integer, db.ForeignKey("saving_throws_table.id"))
-#     saving_throw = db.relationship("SavingThrow", back_populates="saving_throw_values")
 
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     monster = db.relationship("Monster", back_populates="skill_values")
 
+# # TODO: Add validations for saving throws names
+# # TODO: Saving throw names get shorted to attribute name on validation
 
 # # CHARACTER SPECIAL ABILITY ###########################
 # # Example: SpecialAbility(name="Amphibious", 
@@ -146,11 +142,9 @@ class Monster(db.Model):
 
 
 # # CHARACTER SENSE #####################################
-# # Example: Sense(name="darkvision")
-# # Example MonsterSense(distance=120)
+# # Example: Sense(name="darkvision", distance=120)
 # # 
-# # Example: Sense(name="passive perception")
-# # Example MonsterSense(passive_score=12)
+# # Example: Sense(name="passive perception", passive_score=12)
 # # ####################################################
 
 # class Sense(db.Model):
@@ -158,20 +152,13 @@ class Monster(db.Model):
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String, nullable=False)
-
-# class MonsterSense(db.Model):
-#     __tablename__ = "monster_senses_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     sense_id = db.Column(db.Integer, db.ForeignKey("senses_table.id"))
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     distance = db.Column(db.Integer)
 #     passive_score = db.Column(db.Integer)
+#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+
 
 # # CHARACTER LANGUAGE ##################################
 # # Example: Language(name="deep speech")
-# # 
-# # MonsterLanguage exists as join table
 # # ####################################################
 
 # class Language(db.Model):
@@ -179,68 +166,52 @@ class Monster(db.Model):
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String, nullable=False)
-
-# class MonsterLanguage(db.Model):
-#     __tablename__ = "monster_languages_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     language_id = db.Column(db.Integer, db.ForeignKey("languages_table.id"))
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 
 
 # # DAMAGE TYPE #########################################
-# # Example: DamageType(name="cold")
+# # Example: DamageResistance(name="cold")
 # # 
 # # DamageResistance, DamageImmunity, DamageVulnerability 
-# # are joins b/w Monster and DamageType
+# # all require valid damage type
 # # ####################################################
 
-# class DamageType(db.Model):
-#     __tablename__ = "damage_types_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
+# # TODO: Clamp values to valid damage types
 
 # class DamageResistance(db.Model):
 #     __tablename__ = "damage_resistances_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+#     damage_type = db.Column(db.String, nullable=False)
 
 # class DamageImmunity(db.Model):
 #     __tablename__ = "damage_immunities_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+#     damage_type = db.Column(db.String, nullable=False)
 
 # class DamageVulnerability(db.Model):
 #     __tablename__ = "damage_vulnerabilities_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type_id = db.Column(db.Integer, db.ForeignKey("damage_types_table.id"))
+#     damage_type = db.Column(db.String, nullable=False)
 
 
 # # CONDITION TYPE ######################################
-# # Example: ConditionType(name="charmed")
-# # 
-# # ConditionImmunity is join b/w Monster and ConditionType
+# # Example: ConditionImmunity(name="charmed")
 # # ####################################################
 
-# class ConditionType(db.Model):
-#     __tablename__ = "condition_types_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
+# # TODO: Clamp values to valid condition types
 
 # class ConditionImmunity(db.Model):
 #     __tablename__ = "condition_immunities_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String, nullable=False)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     condition_type_id = db.Column(db.Integer, db.ForeignKey("condition_types_table.id"))
 
 
 # # CHARACTER ACTION ####################################
