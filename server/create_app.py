@@ -72,7 +72,10 @@ def create_app(mode="DEVELOPMENT"):
     @app.get('/monsters/<int:id>')
     def get_monster_by_id(id):
         monster = Monster.query.where(Monster.id == id).first()
-        return monster.to_dict(), 200
+        if monster:
+            return monster.to_dict(), 200
+        else:
+            return { "error": "Not found" }, 404
 
 
     # POST MONSTER #########
@@ -88,6 +91,26 @@ def create_app(mode="DEVELOPMENT"):
             db.session.commit()
             return NEW_M.to_dict(), 201
         except ValueError as e:
-            return { "error": f"An error occurred: {e}" }, 406
+            return { "error": f"{e}" }, 422
+
+    # PATCH MONSTER #########
+    # return Monster:dict
+    #######################
+    @app.patch('/monsters/<int:id>')
+    def patch_monster(id):
+        data = request.json
+        filtered_data = { k: v for k, v in data.items() if k in dir(Monster) and '__' not in k }
+        m = Monster.query.where(Monster.id == id).first()
+
+        if m:
+            try:
+                for k in filtered_data:
+                    setattr(m, k, filtered_data[k])
+                db.session.commit()
+                return m.to_dict(), 202
+            except ValueError as e:
+                return { "error": f"{e}" }, 422
+        else:
+            return { "error": "Not found" }, 404
 
     return app

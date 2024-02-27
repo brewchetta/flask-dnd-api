@@ -26,7 +26,4 @@ if __name__ == '__main__':
             db.session.commit()
             print(f"  Created {m.name}...")
 
-        db.session.add_all(mon_list)
-        db.session.commit()
-
         print("Seeding complete!")

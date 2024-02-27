@@ -44,7 +44,7 @@ class TestRoutes:
         assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
 
     def test_get_monsters_with_page(self):
-        """ <GET /monsters?page=0> retrieves a list of monsters offset by a page query defaulting at 10 monsters per page """
+        """ <GET /monsters?page=:int> retrieves a list of monsters offset by a page query defaulting at 10 monsters per page """
 
         mon_list = []
         for n in range(50):
@@ -82,7 +82,7 @@ class TestRoutes:
         assert res_data[0]['name'] == MONSTER_THREE['name']
 
     def test_get_monsters_with_page_count(self):
-        """ <GET /monsters?page_count=0> retrieves a list of monsters of a certain number on a page """
+        """ <GET /monsters?page_count=:int> retrieves a list of monsters of a certain number on a page """
 
         mon_list = []
         for n in range(50):
@@ -115,7 +115,7 @@ class TestRoutes:
         assert res_data[7]['name'] == MONSTER_THREE['name']
 
     def test_get_monsters_with_page_and_page_count(self):
-        """ <GET /monsters?page_count=0&page=0> retrieves a list of monsters of a certain number offset by a number of pages """
+        """ <GET /monsters?page_count=:int&page=:int> retrieves a list of monsters of a certain number offset by a number of pages """
 
         mon_list = []
         for n in range(50):
@@ -232,7 +232,7 @@ class TestRoutes:
         }
 
         res = app.test_client().post( '/monsters', json=MONSTER_DICT )
-        assert res.status_code == 406
+        assert res.status_code == 422
 
         res_data = res.json
         assert res_data['error']
@@ -259,3 +259,66 @@ class TestRoutes:
 
         monster = Monster.query.where( Monster.name == 'Test Monster' ).first()
         assert monster
+
+    def test_patch_monster(self):
+        """ <PATCH /monsters/:id> updates and returns an existing monster """
+
+        MONSTER_DICT = {
+            'name': 'Test Monster',
+            'size': 'medium',
+            'category': 'humanoid',
+        }
+        m = Monster(**MONSTER_DICT)
+        db.session.add(m)
+        db.session.commit()
+
+        res = app.test_client().patch( f"/monsters/{m.id}", json={"name": "Monstar Test"} )
+        assert res.status_code == 202
+
+        res_data = res.json
+        assert res_data['id'] == m.id
+        assert res_data['name'] == 'Monstar Test'
+
+    def test_patch_monster_returns_error_if_invalid(self):
+        """ <PATCH /monsters/:id> returns an error response if invalid """
+
+        MONSTER_DICT = {
+            'name': 'Test Monster',
+            'size': 'medium',
+            'category': 'humanoid',
+        }
+        m = Monster(**MONSTER_DICT)
+        db.session.add(m)
+        db.session.commit()
+
+        res = app.test_client().patch( f"/monsters/{m.id}", json={"category": "mimic"} )
+        assert res.status_code == 422
+
+        res_data = res.json
+        assert res_data['error']
+
+        monster = Monster.query.where( Monster.id == m.id ).first()
+        assert monster.category != "mimic"
+
+    def test_patch_monster_ignores_unused_keys(self):
+        """ <PATCH /monsters> updates and returns a monster and ignores invalid keys """
+
+        MONSTER_DICT = {
+            'name': 'Test Monster',
+            'size': 'medium',
+            'category': 'humanoid',
+        }
+        m = Monster(**MONSTER_DICT)
+        db.session.add(m)
+        db.session.commit()
+
+        res = app.test_client().patch( f"/monsters/{m.id}", json={ "name": "Jimbo", "thacko": "wacko" } )
+        assert res.status_code == 202
+
+        res_data = res.json
+        assert res_data['id']
+        assert res_data['name'] == 'Jimbo'
+        assert res_data.get('thacko') == None
+
+        monster = Monster.query.where( Monster.id == m.id ).first()
+        assert monster.name == 'Jimbo'
