@@ -67,8 +67,6 @@ class TestRoutes:
     def test_get_monsters(self):
         """ <GET /monsters> retrieves a list of monsters """
 
-        print(app.config['SQLALCHEMY_DATABASE_URI'])
-
         db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
         db.session.commit()
 
@@ -79,6 +77,66 @@ class TestRoutes:
         monsters = Monster.query.all()
         assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
         assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+
+    def test_get_monsters_by_name(self):
+        """ <GET /monsters> accepts a 'name' query that returns based on name """
+
+        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?name=mon')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        monsters = Monster.query.where(Monster.name.like("%mon%")).all()
+        assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
+        assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+        assert len(res_data) < len(Monster.query.all())
+
+    def test_get_monsters_by_category(self):
+        """ <GET /monsters> accepts a 'category' query that returns based on category """
+
+        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?category=mon')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        monsters = Monster.query.where(Monster.category.like("%mon%")).all()
+        assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
+        assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+        assert len(res_data) < len(Monster.query.all())
+
+    def test_get_monsters_by_sub_category(self):
+        """ <GET /monsters> accepts a 'sub_category' query that returns based on sub_category """
+
+        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?sub_category=born')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        monsters = Monster.query.where(Monster.sub_category.like("%born%")).all()
+        assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
+        assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+        assert len(res_data) < len(Monster.query.all())
+
+    def test_get_monsters_by_size(self):
+        """ <GET /monsters> accepts a 'size' query that returns based on size """
+
+        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?size=medium')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        monsters = Monster.query.where(Monster.size.like("%medium%")).all()
+        assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
+        assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+        assert len(res_data) < len(Monster.query.all())
 
     def test_post_monster(self):
         """ <POST /monsters> creates and returns new monster """
