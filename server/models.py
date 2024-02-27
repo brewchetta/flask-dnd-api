@@ -76,7 +76,7 @@ class Monster(db.Model, SerializerMixin):
         raise ValueError(f"{k} must be a valid monster category ('aberration', 'beast', 'celestial', 'construct', 'dragon', 'elemental', 'fey', 'fiend', 'giant', 'humanoid', 'monstrosity', 'ooze', 'plant', 'undead') but you put {v}")
 
     @validates("strength", "dexterity", "intelligence", "constitution", "wisdom", "charisma")
-    def validate_abilities(self, k, v):
+    def validate_ability_scores(self, k, v):
         if 0 <= v <= 30:
             return v
         raise ValueError(f"{k} must be between 0 and 30 inclusive but received {v}")
@@ -89,7 +89,7 @@ class Monster(db.Model, SerializerMixin):
     
     @validates("hit_dice_size")
     def validate_dice_values(self, k, v):
-        if v == 4 or v == 6 or v == 8 or v == 10 or v == 12:
+        if v in [ 4, 6, 8, 10, 12 ]:
             return v
         raise ValueError(f"{k} must be a valid size (4, 6, 8, 10, 12) but received {v}")
     
@@ -111,6 +111,7 @@ class Monster(db.Model, SerializerMixin):
 #     monster = db.relationship("Monster", back_populates="skill_values")
     
 # # TODO: Add validations for skill names
+# # TODO: Add association on Monster
 
 
 # # CHARACTER SAVING THROW ##############################
@@ -130,6 +131,8 @@ class Monster(db.Model, SerializerMixin):
 
 # # TODO: Add validations for saving throws names
 # # TODO: Saving throw names get shorted to attribute name on validation
+# # TODO: Add association on Monster
+    
 
 # # CHARACTER SPECIAL ABILITY ###########################
 # # Example: SpecialAbility(name="Amphibious", 
@@ -147,6 +150,7 @@ class Monster(db.Model, SerializerMixin):
 
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     monster = db.relationship("Monster", back_populates="skill_values")
+# # TODO: Add association on Monster
 
 
 # # CHARACTER SENSE #####################################
@@ -163,6 +167,7 @@ class Monster(db.Model, SerializerMixin):
 #     distance = db.Column(db.Integer)
 #     passive_score = db.Column(db.Integer)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+# # TODO: Add association on Monster
 
 
 # # CHARACTER LANGUAGE ##################################
@@ -175,6 +180,7 @@ class Monster(db.Model, SerializerMixin):
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String, nullable=False)
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+# # TODO: Add association on Monster
 
 
 # # DAMAGE TYPE #########################################
@@ -185,6 +191,7 @@ class Monster(db.Model, SerializerMixin):
 # # ####################################################
 
 # # TODO: Clamp values to valid damage types
+# # TODO: Add association on Monster
 
 # class DamageResistance(db.Model):
 #     __tablename__ = "damage_resistances_table"
@@ -213,6 +220,7 @@ class Monster(db.Model, SerializerMixin):
 # # ####################################################
 
 # # TODO: Clamp values to valid condition types
+# # TODO: Add association on Monster
 
 # class ConditionImmunity(db.Model):
 #     __tablename__ = "condition_immunities_table"
@@ -239,6 +247,7 @@ class Monster(db.Model, SerializerMixin):
 #     lair = db.Column(db.Boolean, default=False)
 #     name = db.Column(db.String)
 #     description = db.Column(db.String, nullable=False)
+# # TODO: Add association on Monster
 
 
 # # CHARACTER SPELL #####################################
@@ -276,3 +285,4 @@ class Monster(db.Model, SerializerMixin):
 
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     monster = db.relationship("Monster", back_populates="monster_spells")
+# # TODO: Add association on Monster
