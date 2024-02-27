@@ -34,28 +34,170 @@ class TestMonster:
 
     def test_validates_category(self):
         """ (validations) Validates category to be within certain values list """
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+
+        old_category = m.category
+        
+        m.category = "celestial"
+        db.session.commit()
+
+        assert m.category != old_category
+        assert m.category == "celestial"
+
+        with pytest.raises(ValueError):
+            m.category = "space alien"
+            db.session.commit()
 
     def test_validates_armor_class(self):
         """ (validations) Validates armor_class to be above 0 """
 
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.armor_class = 20
+        db.session.commit()
+        assert m.armor_class == 20
+
+        with pytest.raises(ValueError):
+            m.armor_class = -1
+            db.session.commit()
+
     def test_validates_hit_points(self):
         """ (validations) Validates hit_points to be above 0 """
+
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.hit_points = 20
+        db.session.commit()
+        assert m.hit_points == 20
+
+        with pytest.raises(ValueError):
+            m.hit_points = -1
+            db.session.commit()
+
 
     def test_validates_hit_dice_count(self):
         """ (validations) Validates hit_dice_count to be above 0 """
 
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.hit_dice_count = 20
+        db.session.commit()
+        assert m.hit_dice_count == 20
+
+        with pytest.raises(ValueError):
+            m.hit_dice_count = -1
+            db.session.commit()
+
+
     def test_validates_challenge_rating(self):
         """ (validations) Validates challenge_rating to be above 0 """
+
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.challenge_rating = 20
+        db.session.commit()
+        assert m.challenge_rating == 20
+
+        with pytest.raises(ValueError):
+            m.challenge_rating = -1
+            db.session.commit()
+
 
     def test_validates_proficiency_bonus(self):
         """ (validations) Validates proficiency_bonus to be above 0 """
 
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.proficiency_bonus = 20
+        db.session.commit()
+        assert m.proficiency_bonus == 20
+
+        with pytest.raises(ValueError):
+            m.proficiency_bonus = -1
+            db.session.commit()
+
     def test_validates_hit_dice_size(self):
         """ (validations) Validates hit_dice_size to be only certain values """
+
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.hit_dice_size = 12
+        db.session.commit()
+        assert m.hit_dice_size == 12
+
+        with pytest.raises(ValueError):
+            m.hit_dice_size = 11
+            db.session.commit()
+
 
     def test_validates_ability_scores(self):
         """ (validations) Validates ability scores (strength, dexterity, constitution, intelligence, wisdom, charisma) within proper values """
 
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.strength = 14
+        db.session.commit()
+        assert m.strength == 14
+        
+        with pytest.raises(ValueError):
+            m.strength = 31
+            db.session.commit()
+
+        m.dexterity = 14
+        db.session.commit()
+        assert m.dexterity == 14
+        
+        with pytest.raises(ValueError):
+            m.dexterity = 31
+            db.session.commit()
+
+        m.constitution = 14
+        db.session.commit()
+        assert m.constitution == 14
+        
+        with pytest.raises(ValueError):
+            m.constitution = 31
+            db.session.commit()
+
+        m.intelligence = 14
+        db.session.commit()
+        assert m.intelligence == 14
+        
+        with pytest.raises(ValueError):
+            m.intelligence = 31
+            db.session.commit()
+
+        m.wisdom = 14
+        db.session.commit()
+        assert m.wisdom == 14
+        
+        with pytest.raises(ValueError):
+            m.wisdom = 31
+            db.session.commit()
+
+        m.charisma = 14
+        db.session.commit()
+        assert m.charisma == 14
+        
+        with pytest.raises(ValueError):
+            m.charisma = 31
+            db.session.commit()
 
     def test_has_many_skills(self):
         """ (associations) Can have many associated skills """

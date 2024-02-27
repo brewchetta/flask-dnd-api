@@ -75,7 +75,7 @@ class Monster(db.Model, SerializerMixin):
             return v.lower()
         raise ValueError(f"{k} must be a valid monster category ('aberration', 'beast', 'celestial', 'construct', 'dragon', 'elemental', 'fey', 'fiend', 'giant', 'humanoid', 'monstrosity', 'ooze', 'plant', 'undead') but you put {v}")
 
-    @validates("strength", "dexterity", "constitution", "wisdom", "charisma")
+    @validates("strength", "dexterity", "intelligence", "constitution", "wisdom", "charisma")
     def validate_abilities(self, k, v):
         if 0 <= v <= 30:
             return v
