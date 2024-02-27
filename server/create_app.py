@@ -40,18 +40,18 @@ def create_app(mode="DEVELOPMENT"):
         return "Hello world"
 
     # GET MONSTERS #########
-    # query params: page:int and per_page:int
+    # query params: page:int and page_count:int
     # return monsters:list[Monster:dict]
     #######################
     @app.get('/monsters')
     def get_monsters():
         PAGE = request.args.get('page') or 1
-        PER_PAGE = request.args.get('per_page') or 10
+        PAGE_COUNT = request.args.get('page_count') or 10
         NAME_QUERY = request.args.get('name')
         CATEGORY_QUERY = request.args.get('category')
         SUBCATEGORY_QUERY = request.args.get('sub_category')
         SIZE_QUERY = request.args.get('size')
-        OFFSET = (PAGE - 1) * PER_PAGE
+        OFFSET = (int(PAGE) - 1) * int(PAGE_COUNT)
 
         if NAME_QUERY or CATEGORY_QUERY or SUBCATEGORY_QUERY or SIZE_QUERY:
             monsters = Monster.query.where(
@@ -59,9 +59,9 @@ def create_app(mode="DEVELOPMENT"):
                 Monster.category.like(f"%{CATEGORY_QUERY}%") | 
                 Monster.sub_category.like(f"%{SUBCATEGORY_QUERY}%") | 
                 Monster.size.like(f"%{SIZE_QUERY}%")
-            ).limit(PER_PAGE).offset(OFFSET).all()
+            ).limit(PAGE_COUNT).offset(OFFSET).all()
         else:
-            monsters = Monster.query.limit(PER_PAGE).offset(OFFSET).all()
+            monsters = Monster.query.limit(PAGE_COUNT).offset(OFFSET).all()
 
         return [ m.to_dict() for m in monsters ], 200
 

@@ -26,7 +26,13 @@ class TestRoutes:
     def test_get_monsters(self):
         """ <GET /monsters> retrieves a list of monsters """
 
-        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
         db.session.commit()
 
         res = app.test_client().get('/monsters')
@@ -36,6 +42,100 @@ class TestRoutes:
         monsters = Monster.query.all()
         assert [m.id for m in monsters] == [ m['id'] for m in res_data ]
         assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
+
+    def test_get_monsters_with_page(self):
+        """ <GET /monsters?page=0> retrieves a list of monsters offset by a page query defaulting at 10 monsters per page """
+
+        mon_list = []
+        for n in range(50):
+            if n == 0:
+                mon_list.append(Monster(**MONSTER_ONE))
+            elif n == 10:
+                mon_list.append(Monster(**MONSTER_TWO))
+            elif n == 20:
+                mon_list.append(Monster(**MONSTER_THREE))
+            else:
+                mon_list.append(Monster(**MONSTER_FIVE))
+
+        db.session.add_all(mon_list)
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?page=1')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 10
+        assert res_data[0]['name'] == MONSTER_ONE['name']
+
+        res = app.test_client().get('/monsters?page=2')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 10
+        assert res_data[0]['name'] == MONSTER_TWO['name']
+
+        res = app.test_client().get('/monsters?page=3')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 10
+        assert res_data[0]['name'] == MONSTER_THREE['name']
+
+    def test_get_monsters_with_page_count(self):
+        """ <GET /monsters?page_count=0> retrieves a list of monsters of a certain number on a page """
+
+        mon_list = []
+        for n in range(50):
+            if n == 0:
+                mon_list.append(Monster(**MONSTER_ONE))
+            elif n == 4:
+                mon_list.append(Monster(**MONSTER_TWO))
+            elif n == 7:
+                mon_list.append(Monster(**MONSTER_THREE))
+            else:
+                mon_list.append(Monster(**MONSTER_FIVE))
+
+        db.session.add_all(mon_list)
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?page_count=5')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 5
+        assert res_data[0]['name'] == MONSTER_ONE['name']
+        assert res_data[4]['name'] == MONSTER_TWO['name']
+
+        res = app.test_client().get('/monsters?page_count=8')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 8
+        assert res_data[0]['name'] == MONSTER_ONE['name']
+        assert res_data[7]['name'] == MONSTER_THREE['name']
+
+    def test_get_monsters_with_page_and_page_count(self):
+        """ <GET /monsters?page_count=0&page=0> retrieves a list of monsters of a certain number offset by a number of pages """
+
+        mon_list = []
+        for n in range(50):
+            if n == 5:
+                mon_list.append(Monster(**MONSTER_TWO))
+            elif n == 9:
+                mon_list.append(Monster(**MONSTER_THREE))
+            else:
+                mon_list.append(Monster(**MONSTER_FIVE))
+
+        db.session.add_all(mon_list)
+        db.session.commit()
+
+        res = app.test_client().get('/monsters?page_count=5&page=2')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert len(res_data) == 5
+        assert res_data[0]['name'] == MONSTER_TWO['name']
+        assert res_data[4]['name'] == MONSTER_THREE['name']
 
     def test_get_monsters_by_name(self):
         """ <GET /monsters> accepts a 'name' query that returns based on name """
@@ -55,7 +155,13 @@ class TestRoutes:
     def test_get_monsters_by_category(self):
         """ <GET /monsters> accepts a 'category' query that returns based on category """
 
-        db.session.add_all([Monster(**MONSTER_ONE), Monster(**MONSTER_TWO), Monster(**MONSTER_THREE), Monster(**MONSTER_FOUR), Monster(**MONSTER_FIVE)])
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
         db.session.commit()
 
         res = app.test_client().get('/monsters?category=mon')
