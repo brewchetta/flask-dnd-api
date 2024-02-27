@@ -113,4 +113,18 @@ def create_app(mode="DEVELOPMENT"):
         else:
             return { "error": "Not found" }, 404
 
+    # DELETE MONSTER #########
+    # return None
+    #######################
+    @app.delete('/monsters/<int:id>')
+    def delete_monster(id):
+        m = Monster.query.where(Monster.id == id).first()
+
+        if m:
+            db.session.delete(m)
+            db.session.commit()
+            return {}, 204
+        else:
+            return { "error": "Not found" }, 404
+
     return app

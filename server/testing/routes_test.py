@@ -203,6 +203,44 @@ class TestRoutes:
         assert [m.name for m in monsters] == [ m['name'] for m in res_data ]
         assert len(res_data) < len(Monster.query.all())
 
+    def test_get_monster_by_id(self):
+        """ <GET /monsters/:id> retrieves a monster by id """
+
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters/1')
+        assert res.status_code == 200
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        monster = Monster.query.first()
+        assert res_data['id'] == monster.id 
+        assert res_data['name'] == monster.name 
+
+    def test_get_invalid_monster_by_id(self):
+        """ <GET /monsters/:id> returns a 404 error if no monster found """
+
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
+        db.session.commit()
+
+        res = app.test_client().get('/monsters/6')
+        assert res.status_code == 404
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert res_data['error']
+
     def test_post_monster(self):
         """ <POST /monsters> creates and returns new monster """
 
@@ -322,3 +360,40 @@ class TestRoutes:
 
         monster = Monster.query.where( Monster.id == m.id ).first()
         assert monster.name == 'Jimbo'
+        
+    
+    def test_delete_monster_by_id(self):
+        """ <DELETE /monsters/:id> deletes a monster by id and returns a 204 No Content """
+
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
+        db.session.commit()
+
+        res = app.test_client().delete('/monsters/1')
+        assert res.status_code == 204
+
+        monster = Monster.query.first()
+        assert monster.id != 1
+
+    def test_delete_invalid_monster_by_id(self):
+        """ <DELETE /monsters/:id> returns a 404 error if no monster found """
+
+        db.session.add_all([
+            Monster(**MONSTER_ONE), 
+            Monster(**MONSTER_TWO), 
+            Monster(**MONSTER_THREE), 
+            Monster(**MONSTER_FOUR), 
+            Monster(**MONSTER_FIVE)
+        ])
+        db.session.commit()
+
+        res = app.test_client().delete('/monsters/6')
+        assert res.status_code == 404
+        assert res.content_type == 'application/json'
+        res_data = res.json
+        assert res_data['error']
