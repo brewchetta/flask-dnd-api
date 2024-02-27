@@ -199,6 +199,79 @@ class TestMonster:
             m.charisma = 31
             db.session.commit()
 
+    def test_validates_spell_slots(self):
+        """ (validations) Validates spell slots to be within proper values """
+
+        m = Monster(**MONSTER_TWO)
+        db.session.add(m)
+        db.session.commit()
+        
+        m.spell_slots_first_level = 0
+        db.session.commit()
+        assert m.spell_slots_first_level == 0
+        with pytest.raises(ValueError):
+            m.spell_slots_first_level = -1
+            db.session.commit()
+        with pytest.raises(ValueError):
+            m.spell_slots_first_level = 5
+            db.session.commit()
+
+        m.spell_slots_second_level = 1
+        db.session.commit()
+        assert m.spell_slots_second_level == 1
+        with pytest.raises(ValueError):
+            m.spell_slots_second_level = -1
+            db.session.commit()
+
+        m.spell_slots_third_level = 2
+        db.session.commit()
+        assert m.spell_slots_third_level == 2
+        with pytest.raises(ValueError):
+            m.spell_slots_third_level = 5
+            db.session.commit()
+
+        m.spell_slots_fourth_level = 3
+        db.session.commit()
+        assert m.spell_slots_fourth_level == 3
+        with pytest.raises(ValueError):
+            m.spell_slots_fourth_level = -1
+            db.session.commit()
+
+        m.spell_slots_fifth_level = 4
+        db.session.commit()
+        assert m.spell_slots_fifth_level == 4
+        with pytest.raises(ValueError):
+            m.spell_slots_fifth_level = 5
+            db.session.commit()
+
+        m.spell_slots_sixth_level = 4
+        db.session.commit()
+        assert m.spell_slots_sixth_level == 4
+        with pytest.raises(ValueError):
+            m.spell_slots_sixth_level = 5
+            db.session.commit()
+
+        m.spell_slots_seventh_level = 4
+        db.session.commit()
+        assert m.spell_slots_seventh_level == 4
+        with pytest.raises(ValueError):
+            m.spell_slots_seventh_level = 5
+            db.session.commit()
+
+        m.spell_slots_eighth_level = 4
+        db.session.commit()
+        assert m.spell_slots_eighth_level == 4
+        with pytest.raises(ValueError):
+            m.spell_slots_eighth_level = 5
+            db.session.commit()
+
+        m.spell_slots_ninth_level = 4
+        db.session.commit()
+        assert m.spell_slots_ninth_level == 4
+        with pytest.raises(ValueError):
+            m.spell_slots_ninth_level = 5
+            db.session.commit()
+
     def test_has_many_skills(self):
         """ (associations) Can have many associated skills """
 
