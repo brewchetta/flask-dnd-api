@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from app import app
+from server.app import app
 from models import db, Monster
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
 from faker import Faker

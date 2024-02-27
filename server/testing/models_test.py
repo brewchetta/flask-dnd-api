@@ -1,13 +1,14 @@
 import pytest
 
-from app import app
+from create_app import create_app
 from models import db, Monster
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
+
+app = create_app('TESTING')
 
 @pytest.fixture(autouse=True)
 def run_before_and_after():
     with app.app_context():
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
         db.create_all()
 
         yield
