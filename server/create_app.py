@@ -6,16 +6,29 @@ from models import db, Monster
 
 import config
 
+# ###############################################
+# mode: 'DEVELOPMENT', 'PRODUCTION', 'TESTING'
+# return app:flask.app.Flask
+# 
+# create_app is a factory for app instance that
+# uses proper db and testing params depending on
+# environment
+# ##############################################
+
 def create_app(mode="DEVELOPMENT"):
 
     app = Flask(__name__)
     if mode == "PRODUCTION":
         app.config.from_object('config.ProductionConfig')
-    if mode == "DEVELOPMENT":
+    elif mode == "DEVELOPMENT":
         app.config.from_object('config.DevelopmentConfig')
-    if mode == "TESTING":
+    elif mode == "TESTING":
         app.config.from_object('config.TestingConfig')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    else:
+        raise TypeError(f"create_app requires a mode argument of 'PRODUCTION', 'DEVELOPMENT', or 'TESTING' but got {mode}")
+
+    
+
     app.json.compact = False
 
     migrate = Migrate(app, db)
