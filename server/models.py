@@ -107,6 +107,8 @@ class Monster(db.Model, SerializerMixin):
 # # ####################################################
 
 # class Skill(db.Model, SerializerMixin):
+#    SKILLS = ['arcana']
+    
 #     __tablename__ = "skills_table"
 
 #     id = db.Column(db.Integer, primary_key=True)
@@ -116,6 +118,7 @@ class Monster(db.Model, SerializerMixin):
 #     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 #     monster = db.relationship("Monster", back_populates="skill_values")
     
+# # TODO: Add all skills for class constant
 # # TODO: Add validations for skill names
 # # TODO: Add association on Monster
 
