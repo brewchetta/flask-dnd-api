@@ -35,6 +35,18 @@ def create_app(mode="DEVELOPMENT"):
 
     db.init_app(app)
 
+    # ----------- HELPER METHODS ----------- #
+    
+    # find_monster_by_id ##########
+    # params: id:str
+    # return Monster
+    # ############################
+    def find_monster_by_id(id):
+        return Monster.query.where(Monster.id == id).first()
+
+
+    # ----------- ROUTES ----------- #
+
     @app.get('/')
     def index():
         return "Hello world"
@@ -71,9 +83,9 @@ def create_app(mode="DEVELOPMENT"):
     #######################
     @app.get('/monsters/<int:id>')
     def get_monster_by_id(id):
-        monster = Monster.query.where(Monster.id == id).first()
-        if monster:
-            return monster.to_dict(), 200
+        m = find_monster_by_id(id)
+        if m:
+            return m.to_dict(), 200
         else:
             return { "error": "Not found" }, 404
 
@@ -81,6 +93,7 @@ def create_app(mode="DEVELOPMENT"):
     # POST MONSTER #########
     # return Monster:dict
     #######################
+    # TODO: able to accept list of skills to associate
     @app.post('/monsters')
     def post_monster():
         data = request.json
@@ -100,7 +113,7 @@ def create_app(mode="DEVELOPMENT"):
     def patch_monster(id):
         data = request.json
         filtered_data = { k: v for k, v in data.items() if k in dir(Monster) and '__' not in k }
-        m = Monster.query.where(Monster.id == id).first()
+        m = find_monster_by_id(id)
 
         if m:
             try:
@@ -118,7 +131,7 @@ def create_app(mode="DEVELOPMENT"):
     #######################
     @app.delete('/monsters/<int:id>')
     def delete_monster(id):
-        m = Monster.query.where(Monster.id == id).first()
+        m = find_monster_by_id(id)
 
         if m:
             db.session.delete(m)
@@ -126,5 +139,17 @@ def create_app(mode="DEVELOPMENT"):
             return {}, 204
         else:
             return { "error": "Not found" }, 404
+
+    # GET MONSTERS SKILLS #########
+    # return skills:list[Skill:dict]
+    #######################
+    @app.get('/monsters/<int:id>/skills')
+    def get_monster_skills(id):
+        m = find_monster_by_id(id)
+        if m:
+            return [ s.to_dict(rules=("-monster", "-monster_id")) for s in m.skills ]
+        else:
+            return { "error": "Not found" }, 404
+
 
     return app
