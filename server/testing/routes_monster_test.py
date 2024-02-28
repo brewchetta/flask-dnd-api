@@ -20,8 +20,8 @@ def run_before_and_after():
         db.session.remove()
         db.drop_all()
 
-class TestRoutes:
-    """ [TESTING SUITE: <routes>] """
+class TestMonsterRoutes:
+    """ [TESTING SUITE: <Monster routes>] """
 
     def test_get_monsters(self):
         """ <GET /monsters> retrieves a list of monsters """

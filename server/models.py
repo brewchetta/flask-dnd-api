@@ -98,31 +98,36 @@ class Monster(db.Model, SerializerMixin):
         if v in [0,1,2,3,4]:
             return v
         raise ValueError(f"{k} must be a valid size (0-4) but received {v}")
+    
+    # RELATIONSHIPS #
+
+    skills = db.relationship("Skill", back_populates="monster")
 
 # END Monster #
 
 
-# # CHARACTER SKILL #####################################
-# # Example: Skill(value="2", name="history")
-# # ####################################################
+# CHARACTER SKILL #####################################
+# Example: Skill(value="2", name="history")
+# ####################################################
 
-# class Skill(db.Model, SerializerMixin):
-#    SKILLS = ['arcana']
+class Skill(db.Model, SerializerMixin):
+    SKILLS = ['acrobatics', 'animal handling', 'arcana', 'athletics', 'deception', 'history', 'insight', 'intimidation', 'investigation', 'medicine', 'nature', 'perception', 'performance', 'persuasion', 'religion', 'sleight of hand', 'stealth', 'survival']
     
-#     __tablename__ = "skills_table"
+    __tablename__ = "skills_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     value = db.Column(db.Integer, default=0)
-#     name = db.Column(db.String, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Integer, default=0)
+    name = db.Column(db.String, nullable=False)
 
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     monster = db.relationship("Monster", back_populates="skill_values")
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="skills")
+
+    @validates('name')
+    def validate_skill_name(self, k, v):
+        if v.lower() in self.SKILLS:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid skill name ({ ', '.join(self.SKILLS) }) but got {v}")
     
-# # TODO: Add all skills for class constant
-# # TODO: Add validations for skill names
-# # TODO: Add association on Monster
-
-
 # # CHARACTER SAVING THROW ##############################
 # # Example: SavingThrow(value="2", name="dex")
 # # Example: SavingThrow(value="2", name="dexterity")

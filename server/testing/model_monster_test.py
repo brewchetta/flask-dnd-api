@@ -1,7 +1,7 @@
 import pytest
 
 from create_app import create_app
-from models import db, Monster
+from models import db, Monster, Skill
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
 
 app = create_app('TESTING')
@@ -274,6 +274,19 @@ class TestMonster:
 
     def test_has_many_skills(self):
         """ (associations) Can have many associated skills """
+
+        m = Monster(**MONSTER_ONE)
+        db.session.add(m)
+        db.session.commit()
+
+        s1 = Skill(name="history", value="2", monster_id=m.id)
+        s2 = Skill(name="arcana", value="2", monster_id=m.id)
+        s3 = Skill(name="perception", value="2", monster_id=m.id)
+        db.session.add_all([s1, s2, s3])
+        db.session.commit()
+
+        assert len(m.skills) == 3
+
 
     def test_has_many_saving_throws(self):
         """ (associations) Can have many associated saving_throws """
