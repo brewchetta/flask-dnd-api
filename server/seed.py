@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from app import app
-from models import db, Monster, Skill, SavingThrow
+from models import db, Monster, Skill, SavingThrow, SpecialAbility
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
 from faker import Faker
 
@@ -55,5 +55,18 @@ if __name__ == '__main__':
         db.session.commit()
 
         print(" SavingThrows created...")
+
+        print("\n Creating SpecialAbilities")
+
+        sa1 = SpecialAbility(name='Water Walk', description="Able to walk on water", monster=monsters[0])
+        sa2 = SpecialAbility(name='Amphibious', description="Able to breathe air and water", monster=monsters[1])
+        sa3 = SpecialAbility(name='Hungry', description="So hungry", monster=monsters[2])
+        sa4 = SpecialAbility(name='Turn Undead Resistant', description="Something about turning undead", monster=monsters[3])
+        sa5 = SpecialAbility(name='Blabbermouth', description="Getting in range of this monster will make you made", monster=monsters[4])
+
+        db.session.add_all([sa1, sa2, sa3, sa4, sa5])
+        db.session.commit()
+
+        print(" SpecialAbilities created...")
 
         print("\nSeeding complete!")

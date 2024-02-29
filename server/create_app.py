@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from models import db, Monster, Skill, SavingThrow
+from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 
 import config
 
@@ -102,8 +102,7 @@ def create_app(mode="DEVELOPMENT"):
         filtered_data = { k: v for k, v in data.items() 
                          if k in dir(Monster) 
                          and '__' not in k 
-                         and k not in ['skills', 'saving_throws', 'special_abilities', 'senses', 'languages', 'damage_resistances', 'damage_immunities', 'damage_vulnerabilities', 'condition_immunities', 'actions', 'spells', 'monster_spells']
-                         and 'saving_throws' not in k } 
+                         and k not in ['skills', 'saving_throws', 'special_abilities', 'senses', 'languages', 'damage_resistances', 'damage_immunities', 'damage_vulnerabilities', 'condition_immunities', 'actions', 'spells', 'monster_spells'] } 
                         # add any additional validations for filtering data here including new associations
 
         try:
@@ -138,13 +137,39 @@ def create_app(mode="DEVELOPMENT"):
     @app.patch('/monsters/<int:id>')
     def patch_monster(id):
         data = request.json
-        filtered_data = { k: v for k, v in data.items() if k in dir(Monster) and '__' not in k }
+        filtered_data = { k: v for k, v in data.items() 
+                         if k in dir(Monster) 
+                         and '__' not in k 
+                         and k not in ['skills', 'saving_throws', 'special_abilities', 'senses', 'languages', 'damage_resistances', 'damage_immunities', 'damage_vulnerabilities', 'condition_immunities', 'actions', 'spells', 'monster_spells'] } 
+                        # add any additional validations for filtering data here including new associations
+
         m = find_monster_by_id(id)
 
         if m:
             try:
                 for k in filtered_data:
                     setattr(m, k, filtered_data[k])
+
+                # conditionally add skills
+                if data.get('skills'):
+                    Skill.query.where(Skill.monster_id == m.id).delete()
+
+                    for skill_data in data['skills']:
+                        filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(Skill) and '__' not in k }
+                        NEW_SKILL = Skill(**filtered_skill_data)
+                        NEW_SKILL.monster = m
+                        db.session.add(NEW_SKILL)
+
+                # conditionally add skills
+                if data.get('saving_throws'):
+                    SavingThrow.query.where(SavingThrow.monster_id == m.id).delete()
+
+                    for saving_throw_data in data['saving_throws']:
+                        filtered_saving_throw_data = { k: v for k, v in saving_throw_data.items() if k in dir(SavingThrow) and '__' not in k }
+                        NEW_SAVE = SavingThrow(**filtered_saving_throw_data)
+                        NEW_SAVE.monster = m
+                        db.session.add(NEW_SAVE)
+
                 db.session.commit()
                 return m.to_dict(), 202
             except ValueError as e:
@@ -259,6 +284,25 @@ def create_app(mode="DEVELOPMENT"):
             return {}, 204
         else:
             return { "error": "Not found" }, 404
+
+    # SENSES ROUTES #
+
+    # LANGUAGES ROUTES #
+
+    # DAMAGE RESISTANCES ROUTES #
+
+    # DAMAGE IMMUNITIES ROUTES #
+
+    # DAMAGE VULNERABILITIES ROUTES #
+
+    # CONDITION IMMUNITIES ROUTES #
+
+    # ACTIONS ROUTES #
+
+    # SPELLS ROUTES #
+
+    # MONSTER SPELLS ROUTES #
+
 
 
     return app

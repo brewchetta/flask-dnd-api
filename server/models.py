@@ -106,7 +106,24 @@ class Monster(db.Model, SerializerMixin):
     # RELATIONSHIPS #
 
     skills = db.relationship("Skill", back_populates="monster")
+
     saving_throws = db.relationship("SavingThrow", back_populates="monster")
+
+    special_abilities = db.relationship("SpecialAbility", back_populates="monster")
+
+    senses = db.relationship("Sense", back_populates="monster")
+
+    languages = db.relationship("Language", back_populates="monster")
+
+    damage_resistances = db.relationship("DamageResistance", back_populates="monster")
+    damage_immunities = db.relationship("DamageImmunity", back_populates="monster")
+    damage_vulnerabilities = db.relationship("DamageVulnerability", back_populates="monster")
+    condition_immunities = db.relationship("ConditionImmunity", back_populates="monster")
+
+    actions = db.relationship("Action", back_populates="monster")
+
+    monster_spells = db.relationship("MonsterSpell", back_populates="monster")
+    spells = association_proxy("monster_spells", "spells")
 
 # END Monster #
 
@@ -191,16 +208,19 @@ class SavingThrow(db.Model, SerializerMixin):
 # # belongs to monster
 # # ####################################################
 
-# class SpecialAbility(db.Model, SerializerMixin):
-#     __tablename__ = "special_abilities_table"
+class SpecialAbility(db.Model, SerializerMixin):
+    __tablename__ = "special_abilities_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     description = db.Column(db.String, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
 
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     monster = db.relationship("Monster", back_populates="skill_values")
-# # TODO: Add association on Monster
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="special_abilities")
+# # TODO: Add routes
+# # TODO: Add tests
+    
+# END SpecialAbility #
 
 
 # # CHARACTER SENSE #####################################
@@ -209,28 +229,36 @@ class SavingThrow(db.Model, SerializerMixin):
 # # Example: Sense(name="passive perception", passive_score=12)
 # # ####################################################
 
-# class Sense(db.Model, SerializerMixin):
-#     __tablename__ = "senses_table"
+class Sense(db.Model, SerializerMixin):
+    __tablename__ = "senses_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     distance = db.Column(db.Integer)
-#     passive_score = db.Column(db.Integer)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-# # TODO: Add association on Monster
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    distance = db.Column(db.Integer)
+    passive_score = db.Column(db.Integer)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="senses")
+# # TODO: Add routes
+# # TODO: Add tests
+    
+# END Sense #
 
 
 # # CHARACTER LANGUAGE ##################################
 # # Example: Language(name="deep speech")
 # # ####################################################
 
-# class Language(db.Model):
-#     __tablename__ = "languages_table"
+class Language(db.Model):
+    __tablename__ = "languages_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-# # TODO: Add association on Monster
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="languages")
+# # TODO: Add routes
+# # TODO: Add tests
+
+# END Language #
 
 
 # # DAMAGE TYPE #########################################
@@ -240,44 +268,58 @@ class SavingThrow(db.Model, SerializerMixin):
 # # all require valid damage type
 # # ####################################################
 
+class DamageResistance(db.Model):
+    __tablename__ = "damage_resistances_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    damage_type = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="damage_resistances")
+
+# END DamageResistance #
+
+class DamageImmunity(db.Model):
+    __tablename__ = "damage_immunities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    damage_type = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="damage_immunities")
+
+# END DamageImmunity #
+
+class DamageVulnerability(db.Model):
+    __tablename__ = "damage_vulnerabilities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    damage_type = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="damage_vulnerabilities")
+
 # # TODO: Clamp values to valid damage types
-# # TODO: Add association on Monster
-
-# class DamageResistance(db.Model):
-#     __tablename__ = "damage_resistances_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type = db.Column(db.String, nullable=False)
-
-# class DamageImmunity(db.Model):
-#     __tablename__ = "damage_immunities_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type = db.Column(db.String, nullable=False)
-
-# class DamageVulnerability(db.Model):
-#     __tablename__ = "damage_vulnerabilities_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     damage_type = db.Column(db.String, nullable=False)
+# # TODO: Add routes
+# # TODO: Add tests
+    
+# END DamageVulnerability #
 
 
 # # CONDITION TYPE ######################################
 # # Example: ConditionImmunity(name="charmed")
 # # ####################################################
 
+class ConditionImmunity(db.Model):
+    __tablename__ = "condition_immunities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="condition_immunities")
+
 # # TODO: Clamp values to valid condition types
-# # TODO: Add association on Monster
-
-# class ConditionImmunity(db.Model):
-#     __tablename__ = "condition_immunities_table"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+# # TODO: Add routes
+# # TODO: Add tests
+    
+# END ConditionImmunity #
 
 
 # # CHARACTER ACTION ####################################
@@ -288,16 +330,21 @@ class SavingThrow(db.Model, SerializerMixin):
 # # Actions belong to one monster
 # # ####################################################
 
-# class Action(db.Model):
-#     __tablename__ = "actions_table"
+class Action(db.Model):
+    __tablename__ = "actions_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     legendary = db.Column(db.Boolean, default=False)
-#     lair = db.Column(db.Boolean, default=False)
-#     name = db.Column(db.String)
-#     description = db.Column(db.String, nullable=False)
-# # TODO: Add association on Monster
+    id = db.Column(db.Integer, primary_key=True)
+    legendary_action = db.Column(db.Boolean, default=False)
+    lair_action = db.Column(db.Boolean, default=False)
+    name = db.Column(db.String)
+    description = db.Column(db.String, nullable=False)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="actions")
+
+# # TODO: Add routes
+# # TODO: Add tests
+    
+# END Action #
 
 
 # # CHARACTER SPELL #####################################
@@ -306,33 +353,41 @@ class SavingThrow(db.Model, SerializerMixin):
 # # MonsterSpell exists only as a join table
 # # ####################################################
 
-# class Spell(db.Model):
-#     __tablename__ = "spells_table"
+class Spell(db.Model):
+    __tablename__ = "spells_table"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     description = db.Column(db.String)
-#     level = db.Column(db.Integer, default=0)
-#     casting_time = db.Column(db.String)
-#     duration = db.Column(db.String)
-#     range_area = db.Column(db.String)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String)
+    level = db.Column(db.Integer, default=0)
+    casting_time = db.Column(db.String)
+    duration = db.Column(db.String)
+    range_area = db.Column(db.String)
     
-#     verbal = db.Column(db.Boolean, default=False)
-#     somatic = db.Column(db.Boolean, default=False)
-#     material = db.Column(db.String)
+    verbal = db.Column(db.Boolean, default=False)
+    somatic = db.Column(db.Boolean, default=False)
+    material = db.Column(db.String)
 
-#     school = db.Column(db.String)
-#     attack_save = db.Column(db.String)
-#     damage_type = db.Column(db.String)
+    school = db.Column(db.String)
+    attack_save = db.Column(db.String)
+    damage_type = db.Column(db.String)
 
-# class MonsterSpell(db.Model):
-#     __tablename__ = "monster_spells_table"
+    monster_spells = db.relationship("MonsterSpell", back_populates="spell")
 
-#     id = db.Column(db.Integer, primary_key=True)
+# END Spell #
 
-#     spell_id = db.Column(db.Integer, db.ForeignKey("spells_table.id"))
-#     spell = db.relationship("Spell", back_populates="monster_spells")
+class MonsterSpell(db.Model):
+    __tablename__ = "monster_spells_table"
 
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     monster = db.relationship("Monster", back_populates="monster_spells")
-# # TODO: Add association on Monster
+    id = db.Column(db.Integer, primary_key=True)
+
+    spell_id = db.Column(db.Integer, db.ForeignKey("spells_table.id"))
+    spell = db.relationship("Spell", back_populates="monster_spells")
+
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="monster_spells")
+
+# # TODO: Add routes
+# # TODO: Add tests
+
+# END MonsterSpell #
