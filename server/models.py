@@ -67,6 +67,10 @@ class Monster(db.Model, SerializerMixin):
     spell_slots_eighth_level = db.Column(db.Integer, default=0)
     spell_slots_ninth_level = db.Column(db.Integer, default=0)
 
+    # SERIALIZER #
+
+    serialize_rules = ("-skills.monster", "-saving_throws.monster")
+
     # VALIDATIONS #
 
     @validates("category")
@@ -102,6 +106,7 @@ class Monster(db.Model, SerializerMixin):
     # RELATIONSHIPS #
 
     skills = db.relationship("Skill", back_populates="monster")
+    saving_throws = db.relationship("SavingThrow", back_populates="monster")
 
 # END Monster #
 
@@ -115,6 +120,8 @@ class Skill(db.Model, SerializerMixin):
     
     __tablename__ = "skills_table"
 
+    # COLUMNS #
+
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Integer, default=0)
     name = db.Column(db.String, nullable=False)
@@ -122,31 +129,60 @@ class Skill(db.Model, SerializerMixin):
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="skills")
 
+    # SERIALIZER #
+
+    serialize_rules = ("-monster",)
+
+    # VALIDATIONS #
+
     @validates('name')
     def validate_skill_name(self, k, v):
         if v.lower() in self.SKILLS:
             return v.lower()
         raise ValueError(f"{k} must be a valid skill name ({ ', '.join(self.SKILLS) }) but got {v}")
     
+# END Skill #
+    
+
 # # CHARACTER SAVING THROW ##############################
 # # Example: SavingThrow(value="2", name="dex")
 # # Example: SavingThrow(value="2", name="dexterity")
 # # ####################################################
 
-# class SavingThrow(db.Model, SerializerMixin):
-#     __tablename__ = "saving_throws_table"
+class SavingThrow(db.Model, SerializerMixin):
+    ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'str', 'dex', 'con', 'wis', 'int', 'cha']
+    ABILITIES_DICT = { 'strength': 'str', 'dexterity': 'dex', 'constitution': 'con', 'wisdom': 'wis', 'intelligence': 'int', 'charisma': 'cha' }
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String)
-#     value = db.Column(db.String)
+    __tablename__ = "saving_throws_table"
 
-#     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
-#     monster = db.relationship("Monster", back_populates="skill_values")
+    # COLUMNS #
 
-# # TODO: Add validations for saving throws names
-# # TODO: Saving throw names get shorted to attribute name on validation
-# # TODO: Add association on Monster
-    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    value = db.Column(db.Integer)
+
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="saving_throws")
+
+    # SERIALIZER #
+
+    serialize_rules = ("-monster",)
+
+    # VALIDATIONS #
+
+    # name ######################################
+    # must be within ABILITIES and converted to 
+    # 3 letter signifier with ABILITIES_DICT
+    # ##########################################
+    @validates('name')
+    def validate_skill_name(self, k, v):
+        if v.lower() in self.ABILITIES:
+            return self.ABILITIES_DICT.get(v.lower()) or v.lower()
+        raise ValueError(f"{k} must be a valid saving throw name ({ ', '.join(self.ABILITIES) }) but got {v}")
+
+
+# END SavingThrow #
+
 
 # # CHARACTER SPECIAL ABILITY ###########################
 # # Example: SpecialAbility(name="Amphibious", 

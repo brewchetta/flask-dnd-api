@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from models import db, Monster
+from models import db, Monster, Skill, SavingThrow
 
 import config
 
@@ -50,6 +50,8 @@ def create_app(mode="DEVELOPMENT"):
     @app.get('/')
     def index():
         return "Hello world"
+    
+    # MONSTERS ROUTES #
 
     # GET MONSTERS #########
     # query params: page:int and page_count:int
@@ -97,11 +99,33 @@ def create_app(mode="DEVELOPMENT"):
     @app.post('/monsters')
     def post_monster():
         data = request.json
-        filtered_data = { k: v for k, v in data.items() if k in dir(Monster) and '__' not in k }
+        filtered_data = { k: v for k, v in data.items() 
+                         if k in dir(Monster) 
+                         and '__' not in k 
+                         and 'skills' not in k 
+                         and 'saving_throws' not in k }
         try:
             NEW_M = Monster(**filtered_data)
             db.session.add(NEW_M)
+
+            # conditionally add skills
+            if data.get('skills'):
+                for skill_data in data['skills']:
+                    filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(Skill) and '__' not in k }
+                    NEW_SKILL = Skill(**filtered_skill_data)
+                    NEW_SKILL.monster = NEW_M
+                    db.session.add(NEW_SKILL)
+
+            # conditionally add saving throws
+            if data.get('saving_throws'):
+                for skill_data in data['saving_throws']:
+                    filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(SavingThrow) and '__' not in k }
+                    NEW_SAVE = SavingThrow(**filtered_skill_data)
+                    NEW_SAVE.monster = NEW_M
+                    db.session.add(NEW_SAVE)
+
             db.session.commit()
+
             return NEW_M.to_dict(), 201
         except ValueError as e:
             return { "error": f"{e}" }, 422
@@ -140,6 +164,8 @@ def create_app(mode="DEVELOPMENT"):
         else:
             return { "error": "Not found" }, 404
 
+    # SKILLS ROUTES #
+
     # GET MONSTERS SKILLS #########
     # return skills:list[Skill:dict]
     #######################
@@ -148,6 +174,87 @@ def create_app(mode="DEVELOPMENT"):
         m = find_monster_by_id(id)
         if m:
             return [ s.to_dict(rules=("-monster", "-monster_id")) for s in m.skills ]
+        else:
+            return { "error": "Not found" }, 404
+
+    # PATCH MONSTERS SKILLS #########
+    # return Skill:dict
+    #######################
+    @app.patch('/monsters/<int:monster_id>/skills/<int:id>')
+    def patch_monster_skill(monster_id, id):
+        data = request.json
+        filtered_data = { k: v for k, v in data.items() if k in ['name', 'value'] }
+        m = find_monster_by_id(monster_id)
+        s = Skill.query.where(Skill.id == id).first()
+        if m and s:
+            try:
+                for key in filtered_data:
+                    setattr(s, key, data[key])
+                db.session.commit()
+                return s.to_dict(), 202
+            except ValueError as e:
+                return { 'error': f"{e}" }, 422
+        else:
+            return { "error": "Not found" }, 404
+
+    # DELETE MONSTERS SKILLS #########
+    # return None
+    #######################
+    @app.delete('/monsters/<int:monster_id>/skills/<int:id>')
+    def delete_monster_skill(monster_id, id):
+        m = find_monster_by_id(monster_id)
+        s = Skill.query.where(Skill.id == id).first()
+        if m and s:
+            db.session.delete(s)
+            db.session.commit()
+            return {}, 204
+        else:
+            return { "error": "Not found" }, 404
+        
+    # SAVING THROWS ROUTES #
+
+    # GET MONSTERS SAVING THROWS #########
+    # return saving_throws:list[SavingThrow:dict]
+    #######################
+    @app.get('/monsters/<int:id>/saving-throws')
+    def get_monster_saving_throws(id):
+        m = find_monster_by_id(id)
+        if m:
+            return [ s.to_dict(rules=("-monster", "-monster_id")) for s in m.saving_throws ]
+        else:
+            return { "error": "Not found" }, 404
+
+    # PATCH MONSTERS SAVING THROWS #########
+    # return SavingThrow:dict
+    #######################
+    @app.patch('/monsters/<int:monster_id>/saving-throws/<int:id>')
+    def patch_monster_saving_throw(monster_id, id):
+        data = request.json
+        filtered_data = { k: v for k, v in data.items() if k in ['name', 'value'] }
+        m = find_monster_by_id(monster_id)
+        s = SavingThrow.query.where(SavingThrow.id == id).first()
+        if m and s:
+            try:
+                for key in filtered_data:
+                    setattr(s, key, data[key])
+                db.session.commit()
+                return s.to_dict(), 202
+            except ValueError as e:
+                return { 'error': f"{e}" }, 422
+        else:
+            return { "error": "Not found" }, 404
+
+    # DELETE MONSTERS SAVING THROWS #########
+    # return None
+    #######################
+    @app.delete('/monsters/<int:monster_id>/saving-throws/<int:id>')
+    def delete_monster_saving_throw(monster_id, id):
+        m = find_monster_by_id(monster_id)
+        s = SavingThrow.query.where(SavingThrow.id == id).first()
+        if m and s:
+            db.session.delete(s)
+            db.session.commit()
+            return {}, 204
         else:
             return { "error": "Not found" }, 404
 

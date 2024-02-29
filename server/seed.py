@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from app import app
-from models import db, Monster, Skill
+from models import db, Monster, Skill, SavingThrow
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
 from faker import Faker
 
@@ -14,12 +14,13 @@ if __name__ == '__main__':
 
         db.create_all()
 
-        print(" Deleting old data...")
+        print("\n Deleting old data...")
 
         Monster.query.delete()
         Skill.query.delete()
+        SavingThrow.query.delete()
 
-        print(" Adding monster data...")
+        print("\n Adding monster data...")
 
         for m_dict in [MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE]:
             m = Monster(**m_dict)
@@ -27,7 +28,7 @@ if __name__ == '__main__':
             db.session.commit()
             print(f"  Created {m.name}...")
 
-        print(" Creating Skills")
+        print("\n Creating Skills")
 
         monsters = Monster.query.all()
             
@@ -41,5 +42,18 @@ if __name__ == '__main__':
         db.session.commit()
 
         print(" Skills created...")
+        
+        print("\n Creating SavingThrows")
 
-        print("Seeding complete!")
+        st1 = SavingThrow(name='intelligence', value=1, monster=monsters[0])
+        st2 = SavingThrow(name='dexterity', value=2, monster=monsters[0])
+        st3 = SavingThrow(name='strength', value=3, monster=monsters[1])
+        st4 = SavingThrow(name='charisma', value=4, monster=monsters[1])
+        st5 = SavingThrow(name='constitution', value=5, monster=monsters[2])
+
+        db.session.add_all([st1, st2, st3, st4, st5])
+        db.session.commit()
+
+        print(" SavingThrows created...")
+
+        print("\nSeeding complete!")
