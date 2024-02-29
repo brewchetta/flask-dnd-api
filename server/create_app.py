@@ -102,8 +102,10 @@ def create_app(mode="DEVELOPMENT"):
         filtered_data = { k: v for k, v in data.items() 
                          if k in dir(Monster) 
                          and '__' not in k 
-                         and 'skills' not in k 
-                         and 'saving_throws' not in k }
+                         and k not in ['skills', 'saving_throws', 'special_abilities', 'senses', 'languages', 'damage_resistances', 'damage_immunities', 'damage_vulnerabilities', 'condition_immunities', 'actions', 'spells', 'monster_spells']
+                         and 'saving_throws' not in k } 
+                        # add any additional validations for filtering data here including new associations
+
         try:
             NEW_M = Monster(**filtered_data)
             db.session.add(NEW_M)
