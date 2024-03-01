@@ -327,10 +327,11 @@ class DamageVulnerability(db.Model):
 # # ####################################################
 
 class ConditionImmunity(db.Model):
+    CONDITION_TYPES = ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'grappled', 'incapacitated', 'invisible', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned', 'unconscious']
     __tablename__ = "condition_immunities_table"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    condition_type = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="condition_immunities")
 
@@ -398,6 +399,10 @@ class Spell(db.Model):
     monster_spells = db.relationship("MonsterSpell", back_populates="spell")
 
     serialize_rules = ("-monster_spells",)
+
+    # TODO: Clamp spell schools
+    # TODO: Clamp spell damage types
+    # TODO: Clamp spell attack save types (dex etc.)
 
 # END Spell #
 
