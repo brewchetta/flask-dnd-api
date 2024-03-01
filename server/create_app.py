@@ -48,13 +48,14 @@ def create_app(mode="DEVELOPMENT"):
     app.register_blueprint( monster_routes_blueprint )
     app.register_blueprint( create_nested_monster_routes_blueprint('skills', Skill) )
     app.register_blueprint( create_nested_monster_routes_blueprint('saving_throws', SavingThrow) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('special_abilities', SpecialAbility) )
     app.register_blueprint( create_nested_monster_routes_blueprint('senses', Sense) )
     app.register_blueprint( create_nested_monster_routes_blueprint('languages', Language) )
-    app.register_blueprint( create_nested_monster_routes_blueprint('damage_resistances', Language) )
-    app.register_blueprint( create_nested_monster_routes_blueprint('damage_immunities', Language) )
-    app.register_blueprint( create_nested_monster_routes_blueprint('damage_vulnerabilities', Language) )
-    app.register_blueprint( create_nested_monster_routes_blueprint('condition_immunities', Language) )
-    app.register_blueprint( create_nested_monster_routes_blueprint('actions', Language) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('damage_resistances', DamageResistance) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('damage_immunities', DamageImmunity) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('damage_vulnerabilities', DamageVulnerability) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('condition_immunities', ConditionImmunity) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('actions', Action) )
 
     # SPELLS ROUTES #
 
