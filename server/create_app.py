@@ -43,6 +43,24 @@ def create_app(mode="DEVELOPMENT"):
     # ############################
     def find_monster_by_id(id):
         return Monster.query.where(Monster.id == id).first()
+    
+    # replace_nested_monster_data #################
+    # params: data:list[dict], parent:Monster, 
+    # child_class:class, valid_attributes:list[str]
+    # 
+    # return list[child_class_instance]
+    # ###########################################
+    def replace_nested_monster_data(data, parent, child_class, valid_attributes):
+        child_class.query.where(child_class.monster_id == parent.id).delete()
+        new_items = []
+        for item_dict in data:
+            filtered_item_dict = { k: v for k, v in item_dict.items() if k in valid_attributes }
+            new_item = child_class(**filtered_item_dict)
+            new_item.monster = parent
+            db.session.add(new_item)
+            new_items.append(new_item)
+        return new_item
+
 
 
     # ----------- ROUTES ----------- #
@@ -109,21 +127,28 @@ def create_app(mode="DEVELOPMENT"):
             NEW_M = Monster(**filtered_data)
             db.session.add(NEW_M)
 
-            # conditionally add skills
             if data.get('skills'):
-                for skill_data in data['skills']:
-                    filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(Skill) and '__' not in k }
-                    NEW_SKILL = Skill(**filtered_skill_data)
-                    NEW_SKILL.monster = NEW_M
-                    db.session.add(NEW_SKILL)
-
-            # conditionally add saving throws
+                replace_nested_monster_data(data['skills'], NEW_M, Skill, ['name', 'value'])
             if data.get('saving_throws'):
-                for skill_data in data['saving_throws']:
-                    filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(SavingThrow) and '__' not in k }
-                    NEW_SAVE = SavingThrow(**filtered_skill_data)
-                    NEW_SAVE.monster = NEW_M
-                    db.session.add(NEW_SAVE)
+                replace_nested_monster_data(data['saving_throws'], NEW_M, SavingThrow, ['name', 'value'])
+            if data.get('saving_throws'):
+                replace_nested_monster_data(data['saving_throws'], NEW_M, SavingThrow, ['name', 'value'])
+            if data.get('special_abilities'):
+                replace_nested_monster_data(data['special_abilities'], NEW_M, SpecialAbility, ['name', 'description'])
+            if data.get('senses'):
+                replace_nested_monster_data(data['senses'], NEW_M, Language, ['name', 'distance'])
+            if data.get('languages'):
+                replace_nested_monster_data(data['languages'], NEW_M, Language, ['name'])
+            if data.get('damage_resistances'):
+                replace_nested_monster_data(data['damage_resistances'], NEW_M, DamageResistance, ['damage_type'])
+            if data.get('damage_immunities'):
+                replace_nested_monster_data(data['damage_immunities'], NEW_M, DamageImmunity, ['damage_type'])
+            if data.get('damage_vulnerabilities'):
+                replace_nested_monster_data(data['damage_vulnerabilities'], NEW_M, DamageVulnerability, ['damage_type'])
+            if data.get('condition_immunities'):
+                replace_nested_monster_data(data['condition_immunities'], NEW_M, ConditionImmunity, ['condition_type'])
+            if data.get('actions'):
+                replace_nested_monster_data(data['actions'], NEW_M, Action, ['legendary_action', 'lair_action', 'name', 'description'])
 
             db.session.commit()
 
@@ -150,25 +175,28 @@ def create_app(mode="DEVELOPMENT"):
                 for k in filtered_data:
                     setattr(m, k, filtered_data[k])
 
-                # conditionally add skills
                 if data.get('skills'):
-                    Skill.query.where(Skill.monster_id == m.id).delete()
-
-                    for skill_data in data['skills']:
-                        filtered_skill_data = { k: v for k, v in skill_data.items() if k in dir(Skill) and '__' not in k }
-                        NEW_SKILL = Skill(**filtered_skill_data)
-                        NEW_SKILL.monster = m
-                        db.session.add(NEW_SKILL)
-
-                # conditionally add skills
+                    replace_nested_monster_data(data['skills'], m, Skill, ['name', 'value'])
                 if data.get('saving_throws'):
-                    SavingThrow.query.where(SavingThrow.monster_id == m.id).delete()
-
-                    for saving_throw_data in data['saving_throws']:
-                        filtered_saving_throw_data = { k: v for k, v in saving_throw_data.items() if k in dir(SavingThrow) and '__' not in k }
-                        NEW_SAVE = SavingThrow(**filtered_saving_throw_data)
-                        NEW_SAVE.monster = m
-                        db.session.add(NEW_SAVE)
+                    replace_nested_monster_data(data['saving_throws'], m, SavingThrow, ['name', 'value'])
+                if data.get('saving_throws'):
+                    replace_nested_monster_data(data['saving_throws'], m, SavingThrow, ['name', 'value'])
+                if data.get('special_abilities'):
+                    replace_nested_monster_data(data['special_abilities'], m, SpecialAbility, ['name', 'description'])
+                if data.get('senses'):
+                    replace_nested_monster_data(data['senses'], m, Language, ['name', 'distance'])
+                if data.get('languages'):
+                    replace_nested_monster_data(data['languages'], m, Language, ['name'])
+                if data.get('damage_resistances'):
+                    replace_nested_monster_data(data['damage_resistances'], m, DamageResistance, ['damage_type'])
+                if data.get('damage_immunities'):
+                    replace_nested_monster_data(data['damage_immunities'], m, DamageImmunity, ['damage_type'])
+                if data.get('damage_vulnerabilities'):
+                    replace_nested_monster_data(data['damage_vulnerabilities'], m, DamageVulnerability, ['damage_type'])
+                if data.get('condition_immunities'):
+                    replace_nested_monster_data(data['condition_immunities'], m, ConditionImmunity, ['condition_type'])
+                if data.get('actions'):
+                    replace_nested_monster_data(data['actions'], m, Action, ['legendary_action', 'lair_action', 'name', 'description'])
 
                 db.session.commit()
                 return m.to_dict(), 202
