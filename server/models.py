@@ -252,7 +252,7 @@ class Sense(db.Model, SerializerMixin):
 # # Example: Language(name="deep speech")
 # # ####################################################
 
-class Language(db.Model):
+class Language(db.Model, SerializerMixin):
     __tablename__ = "languages_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -274,7 +274,7 @@ class Language(db.Model):
 # # all require valid damage type
 # # ####################################################
 
-class DamageResistance(db.Model):
+class DamageResistance(db.Model, SerializerMixin):
     DAMAGE_TYPES = DAMAGE_TYPES
 
     __tablename__ = "damage_resistances_table"
@@ -288,7 +288,7 @@ class DamageResistance(db.Model):
 
 # END DamageResistance #
 
-class DamageImmunity(db.Model):
+class DamageImmunity(db.Model, SerializerMixin):
     DAMAGE_TYPES = DAMAGE_TYPES
 
     __tablename__ = "damage_immunities_table"
@@ -302,7 +302,7 @@ class DamageImmunity(db.Model):
 
 # END DamageImmunity #
 
-class DamageVulnerability(db.Model):
+class DamageVulnerability(db.Model, SerializerMixin):
     DAMAGE_TYPES = DAMAGE_TYPES
 
     __tablename__ = "damage_vulnerabilities_table"
@@ -326,7 +326,7 @@ class DamageVulnerability(db.Model):
 # # Example: ConditionImmunity(name="charmed")
 # # ####################################################
 
-class ConditionImmunity(db.Model):
+class ConditionImmunity(db.Model, SerializerMixin):
     CONDITION_TYPES = ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'grappled', 'incapacitated', 'invisible', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned', 'unconscious']
     __tablename__ = "condition_immunities_table"
 
@@ -352,7 +352,7 @@ class ConditionImmunity(db.Model):
 # # Actions belong to one monster
 # # ####################################################
 
-class Action(db.Model):
+class Action(db.Model, SerializerMixin):
     __tablename__ = "actions_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -377,7 +377,7 @@ class Action(db.Model):
 # # MonsterSpell exists only as a join table
 # # ####################################################
 
-class Spell(db.Model):
+class Spell(db.Model, SerializerMixin):
     __tablename__ = "spells_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -406,7 +406,7 @@ class Spell(db.Model):
 
 # END Spell #
 
-class MonsterSpell(db.Model):
+class MonsterSpell(db.Model, SerializerMixin):
     __tablename__ = "monster_spells_table"
 
     id = db.Column(db.Integer, primary_key=True)
