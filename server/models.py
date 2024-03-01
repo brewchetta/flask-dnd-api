@@ -3,6 +3,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
+from damage_types import DAMAGE_TYPES
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -49,6 +50,8 @@ class Monster(db.Model, SerializerMixin):
     wisdom = db.Column(db.Integer, default=10)
     charisma = db.Column(db.Integer, default=10)
 
+    passive_perception = db.Column(db.Integer, default=10)
+
     challenge_rating = db.Column(db.Integer, default=0)
     proficiency_bonus = db.Column(db.Integer, default=2)
 
@@ -69,7 +72,7 @@ class Monster(db.Model, SerializerMixin):
 
     # SERIALIZER #
 
-    serialize_rules = ("-skills.monster", "-saving_throws.monster")
+    serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "-spells.monster_spells")
 
     # VALIDATIONS #
 
@@ -217,6 +220,8 @@ class SpecialAbility(db.Model, SerializerMixin):
 
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="special_abilities")
+
+    serialize_rules = ("-monster",)
 # # TODO: Add routes
 # # TODO: Add tests
     
@@ -225,8 +230,6 @@ class SpecialAbility(db.Model, SerializerMixin):
 
 # # CHARACTER SENSE #####################################
 # # Example: Sense(name="darkvision", distance=120)
-# # 
-# # Example: Sense(name="passive perception", passive_score=12)
 # # ####################################################
 
 class Sense(db.Model, SerializerMixin):
@@ -235,9 +238,10 @@ class Sense(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     distance = db.Column(db.Integer)
-    passive_score = db.Column(db.Integer)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="senses")
+
+    serialize_rules = ("-monster",)
 # # TODO: Add routes
 # # TODO: Add tests
     
@@ -255,6 +259,8 @@ class Language(db.Model):
     name = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="languages")
+
+    serialize_rules = ("-monster",)
 # # TODO: Add routes
 # # TODO: Add tests
 
@@ -269,6 +275,8 @@ class Language(db.Model):
 # # ####################################################
 
 class DamageResistance(db.Model):
+    DAMAGE_TYPES = DAMAGE_TYPES
+
     __tablename__ = "damage_resistances_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -276,9 +284,13 @@ class DamageResistance(db.Model):
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_resistances")
 
+    serialize_rules = ("-monster",)
+
 # END DamageResistance #
 
 class DamageImmunity(db.Model):
+    DAMAGE_TYPES = DAMAGE_TYPES
+
     __tablename__ = "damage_immunities_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -286,9 +298,13 @@ class DamageImmunity(db.Model):
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_immunities")
 
+    serialize_rules = ("-monster",)
+
 # END DamageImmunity #
 
 class DamageVulnerability(db.Model):
+    DAMAGE_TYPES = DAMAGE_TYPES
+
     __tablename__ = "damage_vulnerabilities_table"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -296,7 +312,10 @@ class DamageVulnerability(db.Model):
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_vulnerabilities")
 
+    serialize_rules = ("-monster",)
+
 # # TODO: Clamp values to valid damage types
+# # TODO: Avoid creating repeat data for damage (immunity overwrites resistance, etc.)
 # # TODO: Add routes
 # # TODO: Add tests
     
@@ -314,6 +333,8 @@ class ConditionImmunity(db.Model):
     name = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="condition_immunities")
+
+    serialize_rules = ("-monster",)
 
 # # TODO: Clamp values to valid condition types
 # # TODO: Add routes
@@ -340,6 +361,8 @@ class Action(db.Model):
     description = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="actions")
+
+    serialize_rules = ("-monster",)
 
 # # TODO: Add routes
 # # TODO: Add tests
@@ -374,6 +397,8 @@ class Spell(db.Model):
 
     monster_spells = db.relationship("MonsterSpell", back_populates="spell")
 
+    serialize_rules = ("-monster_spells",)
+
 # END Spell #
 
 class MonsterSpell(db.Model):
@@ -386,6 +411,8 @@ class MonsterSpell(db.Model):
 
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="monster_spells")
+
+    serialize_rules = ("-monster",)
 
 # # TODO: Add routes
 # # TODO: Add tests
