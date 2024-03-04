@@ -200,7 +200,6 @@ class SavingThrow(db.Model, SerializerMixin):
             return self.ABILITIES_DICT.get(v.lower()) or v.lower()
         raise ValueError(f"{k} must be a valid saving throw name ({ ', '.join(self.ABILITIES) }) but got {v}")
 
-
 # END SavingThrow #
 
 
@@ -222,8 +221,6 @@ class SpecialAbility(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="special_abilities")
 
     serialize_rules = ("-monster",)
-# # TODO: Add routes
-# # TODO: Add tests
     
 # END SpecialAbility #
 
@@ -242,8 +239,6 @@ class Sense(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="senses")
 
     serialize_rules = ("-monster",)
-# # TODO: Add routes
-# # TODO: Add tests
     
 # END Sense #
 
@@ -261,68 +256,51 @@ class Language(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="languages")
 
     serialize_rules = ("-monster",)
-# # TODO: Add routes
-# # TODO: Add tests
 
 # END Language #
 
 
-# # DAMAGE TYPE #########################################
+# # DAMAGE MODEL #########################################
 # # Example: DamageResistance(name="cold")
 # # 
 # # DamageResistance, DamageImmunity, DamageVulnerability 
 # # all require valid damage type
 # # ####################################################
-
-class DamageResistance(db.Model, SerializerMixin):
+    
+class DamageModel(db.Model, SerializerMixin):
     DAMAGE_TYPES = DAMAGE_TYPES
 
-    __tablename__ = "damage_resistances_table"
-
     id = db.Column(db.Integer, primary_key=True)
+
     damage_type = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+
+    @validates("damage_type")
+    def validate_damage_type(self, k, v):
+        if v.lower() in self.DAMAGE_TYPES:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+
+    serialize_rules = ("-monster",)
+
+# # TODO: In routes avoid creating repeat data for damage (immunity overwrites resistance, etc.)
+
+class DamageResistance(DamageModel):
+    __tablename__ = "damage_resistances_table"
     monster = db.relationship("Monster", back_populates="damage_resistances")
 
-    serialize_rules = ("-monster",)
-
-# END DamageResistance #
-
-class DamageImmunity(db.Model, SerializerMixin):
-    DAMAGE_TYPES = DAMAGE_TYPES
-
+class DamageImmunity(DamageModel):
     __tablename__ = "damage_immunities_table"
-
-    id = db.Column(db.Integer, primary_key=True)
-    damage_type = db.Column(db.String, nullable=False)
-    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_immunities")
 
-    serialize_rules = ("-monster",)
-
-# END DamageImmunity #
-
-class DamageVulnerability(db.Model, SerializerMixin):
-    DAMAGE_TYPES = DAMAGE_TYPES
-
+class DamageVulnerability(DamageModel):
     __tablename__ = "damage_vulnerabilities_table"
-
-    id = db.Column(db.Integer, primary_key=True)
-    damage_type = db.Column(db.String, nullable=False)
-    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_vulnerabilities")
 
-    serialize_rules = ("-monster",)
+# END DamageModels #
 
-# # TODO: Clamp values to valid damage types
-# # TODO: Avoid creating repeat data for damage (immunity overwrites resistance, etc.)
-# # TODO: Add routes
-# # TODO: Add tests
     
-# END DamageVulnerability #
-
-
-# # CONDITION TYPE ######################################
+# # CONDITION IMMUNITY ######################################
 # # Example: ConditionImmunity(name="charmed")
 # # ####################################################
 
@@ -337,9 +315,13 @@ class ConditionImmunity(db.Model, SerializerMixin):
 
     serialize_rules = ("-monster",)
 
-# # TODO: Clamp values to valid condition types
-# # TODO: Add routes
-# # TODO: Add tests
+    @validates("condition_type")
+    def validate_condition_type(self, k, v):
+        if v.lower() in self.CONDITION_TYPES:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid condition type ({ ', '.join(self.CONDITION_TYPES) }) but got {v}")
+
+# # TODO: In routes avoid creating repeat data for condition_immunity (cannot have repeats of the same condition etc.)
     
 # END ConditionImmunity #
 
@@ -364,9 +346,6 @@ class Action(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="actions")
 
     serialize_rules = ("-monster",)
-
-# # TODO: Add routes
-# # TODO: Add tests
     
 # END Action #
 

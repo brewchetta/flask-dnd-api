@@ -21,7 +21,7 @@ def create_nested_monster_models_test(model_name, model_test_data, model_invalid
 
     test_file = Path(f'testing/models/model_{model_name.lower()}_test.py')
     if test_file.is_file() and not REGENERATE:
-        print(f"File model_{model_name.lower()}_test.py already exists, manually delete it to regenerate")
+        print(f"File model_{model_name.lower()}_test.py already exists, manually delete it to regenerate or set REGENERATE=True")
 
     else:
         test_model_kargs_string = ", ".join( [ f"{k}=\"{model_test_data[k]}\"" for k in model_test_data.keys() ] )
