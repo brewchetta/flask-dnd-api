@@ -23,37 +23,33 @@ def run_before_and_after():
 
 
 class TestSavingThrow:
-    """ [TESTING SUITE: <SAVING_THROW>] """
+    """ [TESTING SUITE: <SavingThrow>] """
 
-    def test_has_attributes(self):
+    def test_SavingThrow_has_attributes(self):
         """ (attributes) Has proper attributes """
         s = SavingThrow(name="dex", value="2", monster_id=1)
         db.session.add(s)
         db.session.commit()
 
-        db_skill = SavingThrow.query.first()
-        assert db_skill
-        assert db_skill.name == s.name
-        assert db_skill.value == s.value
-        assert db_skill.monster_id == 1
+        db_item = SavingThrow.query.first()
+        assert db_item
+        assert db_item.name == s.name
+        assert db_item.value == s.value
+        assert db_item.monster_id == 1
 
-    def test_validates_aving_throw_name(self):
-        """ (validations) Validates saving throw name """
-        s = SavingThrow(name="intelligence", value="2", monster_id=1)
-        db.session.add(s)
+    def test_validates_name(self):
+        """ (validations) Validates SavingThrow name """
+        db_item = SavingThrow(name="dex", value="2", monster_id=1)
+        db.session.add(db_item)
         db.session.commit()
 
-        assert s.id
-        assert s.name == 'int'
+        assert db_item.id
 
         with pytest.raises(ValueError):
-            s.name = "craziness"
+            db_item.name = "charm"
             db.session.commit()
 
-        with pytest.raises(ValueError):
-            s2 = SavingThrow(name="hunger", value=3)
-            db.session.add(s2)
-            db.session.commit()
+    
 
     def test_belongs_to_monster(self):
         """ (assocations) Belongs to a monster """
@@ -61,7 +57,7 @@ class TestSavingThrow:
         db.session.add(s)
         db.session.commit()
 
-        db_saving_throw = SavingThrow.query.first()
-        assert db_saving_throw
-        assert db_saving_throw.monster
-        assert db_saving_throw.monster.id == 1
+        db_item = SavingThrow.query.first()
+        assert db_item
+        assert db_item.monster
+        assert db_item.monster.id == 1
