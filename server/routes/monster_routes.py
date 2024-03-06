@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 monster_routes_blueprint = Blueprint('monster_routes_blueprint', __name__)
-from helpers import replace_nested_monster_data, find_monster_by_id, replace_associated_monster_spells
+from helpers import replace_nested_monster_data, find_monster_by_id, find_spell_by_name, find_spell_by_id, replace_associated_monster_spells
 
 # ------------------- MONSTERS ROUTES ------------------- #
 
@@ -161,24 +161,21 @@ def delete_monster(id):
 # POST MONSTER SPELL #########
 # return MonsterSpell:dict
 #######################
-@monster_routes_blueprint.post('/monster/<int:id>/monster-spells')
+@monster_routes_blueprint.post('/monsters/<int:id>/spells')
 def create_monster_spell(id):
     data = request.json
     spell_name = data.get('spell_name')
     spell_id = data.get('spell_id')
 
     m = find_monster_by_id(id)
-    s = Spell.query.where(
-        Spell.name == spell_name |
-        Spell.id == spell_id
-    ).first()
+    s = find_spell_by_name(data.get('name')) or find_spell_by_id(data.get('id'))
 
     if m and s:
         try:
             ms = MonsterSpell(monster=m, spell=s)
             db.session.add(ms)
             db.session.commit()
-            return ms.to_dict(), 201
+            return s.to_dict(), 201
         except ValueError as e:
             return { "error": f"{e}" }, 422
     else:
@@ -187,12 +184,14 @@ def create_monster_spell(id):
 # DELETE MONSTER SPELL #########
 # return None
 #######################
-@monster_routes_blueprint.post('/monster/<int:monster_id>/monster-spells/<int:id>')
-def create_monster_spell(monster_id, id):
-    m = find_monster_by_id(monster_id)
-    ms = MonsterSpell.query.where(MonsterSpell.id == id).first()
+@monster_routes_blueprint.delete('/monsters/<int:monster_id>/spells/<int:spell_id>')
+def delete_monster_spell(monster_id, spell_id):
+    ms = MonsterSpell.query.where(
+        (MonsterSpell.monster_id == monster_id) & 
+        (MonsterSpell.spell_id == spell_id)
+    ).first()
 
-    if m and ms:
+    if ms:
         db.session.delete(ms)
         db.session.commit()
         return {}, 204

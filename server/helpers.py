@@ -20,11 +20,11 @@ def find_spell_by_id(id):
 
 
 # find_spell_by_name ##########
-# params: id:str
+# params: name:str
 # return Spell
 # ############################
 def find_spell_by_name(name):
-    return Spell.query.where(Spell.name == name).first()
+    return Spell.query.where(Spell.name.ilike(name)).first()
 
 
 # replace_nested_monster_data #################
@@ -54,6 +54,7 @@ def replace_associated_monster_spells(spell_names, parent):
     new_joins = []
     for s_name in spell_names:
         spell = find_spell_by_name(s_name)
+        print(spell, s_name)
         if spell:
             try:
                 ms = MonsterSpell(monster=parent, spell=spell)
@@ -62,4 +63,5 @@ def replace_associated_monster_spells(spell_names, parent):
                 new_joins.append(ms)
             except Exception as e:
                 print(f"An exception has occurred: {e}")
+    print(new_joins)
     return new_joins

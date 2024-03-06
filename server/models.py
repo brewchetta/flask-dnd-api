@@ -72,7 +72,7 @@ class Monster(db.Model, SerializerMixin):
 
     # SERIALIZER #
 
-    serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "-spells.monster_spells")
+    serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "spells", "-spells.monster_spells")
 
     # VALIDATIONS #
 
@@ -126,7 +126,7 @@ class Monster(db.Model, SerializerMixin):
     actions = db.relationship("Action", back_populates="monster")
 
     monster_spells = db.relationship("MonsterSpell", back_populates="monster")
-    spells = association_proxy("monster_spells", "spells")
+    spells = association_proxy("monster_spells", "spell")
 
 # END Monster #
 
