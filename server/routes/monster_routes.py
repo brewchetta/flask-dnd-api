@@ -62,8 +62,6 @@ def post_monster():
             replace_nested_monster_data(data['skills'], NEW_M, Skill, ['name', 'value'])
         if data.get('saving_throws'):
             replace_nested_monster_data(data['saving_throws'], NEW_M, SavingThrow, ['name', 'value'])
-        if data.get('saving_throws'):
-            replace_nested_monster_data(data['saving_throws'], NEW_M, SavingThrow, ['name', 'value'])
         if data.get('special_abilities'):
             replace_nested_monster_data(data['special_abilities'], NEW_M, SpecialAbility, ['name', 'description'])
         if data.get('senses'):

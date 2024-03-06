@@ -91,7 +91,7 @@ class Monster(db.Model, SerializerMixin):
 
     @validates("armor_class", "hit_points", "hit_dice_count", "challenge_rating", "proficiency_bonus")
     def validate_non_zero_stats(self, k, v):
-        if v > 0:
+        if int(v) > 0:
             return v
         raise ValueError(f"{k} must be 1 or greater but received {v}")
     
