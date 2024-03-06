@@ -34,6 +34,7 @@ class Monster(db.Model, SerializerMixin):
 
     name = db.Column(db.String, nullable=False)
     size = db.Column(db.String, default="medium")
+    alignment = db.Column(db.String)
 
     category = db.Column(db.String)
     sub_category = db.Column(db.String)
@@ -72,7 +73,7 @@ class Monster(db.Model, SerializerMixin):
 
     # SERIALIZER #
 
-    serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "spells", "-spells.monster_spells")
+    serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-speeds.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "spells", "-spells.monster_spells")
 
     # VALIDATIONS #
 
@@ -115,6 +116,8 @@ class Monster(db.Model, SerializerMixin):
     special_abilities = db.relationship("SpecialAbility", back_populates="monster")
 
     senses = db.relationship("Sense", back_populates="monster")
+
+    speeds = db.relationship("Speed", back_populates="monster")
 
     languages = db.relationship("Language", back_populates="monster")
 
@@ -243,6 +246,24 @@ class Sense(db.Model, SerializerMixin):
 # END Sense #
 
 
+# # CHARACTER SPEED #####################################
+# # Example: Speed(name="walk", distance="20 ft.")
+# # ####################################################
+
+class Speed(db.Model, SerializerMixin):
+    __tablename__ = "speed_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    distance = db.Column(db.Integer)
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+    monster = db.relationship("Monster", back_populates="speeds")
+
+    serialize_rules = ("-monster",)
+    
+# END Speed #
+
+
 # # CHARACTER LANGUAGE ##################################
 # # Example: Language(name="deep speech")
 # # ####################################################
@@ -283,8 +304,6 @@ class DamageModel(db.Model, SerializerMixin):
 
     serialize_rules = ("-monster",)
 
-# # TODO: In routes avoid creating repeat data for damage (immunity overwrites resistance, etc.)
-
 class DamageResistance(DamageModel):
     __tablename__ = "damage_resistances_table"
     monster = db.relationship("Monster", back_populates="damage_resistances")
@@ -320,8 +339,6 @@ class ConditionImmunity(db.Model, SerializerMixin):
         if v.lower() in self.CONDITION_TYPES:
             return v.lower()
         raise ValueError(f"{k} must be a valid condition type ({ ', '.join(self.CONDITION_TYPES) }) but got {v}")
-
-# # TODO: In routes avoid creating repeat data for condition_immunity (cannot have repeats of the same condition etc.)
     
 # END ConditionImmunity #
 
@@ -422,7 +439,6 @@ class MonsterSpell(db.Model, SerializerMixin):
 
     serialize_rules = ("-monster",)
 
-# # TODO: Add routes
-# # TODO: Add tests
-
 # END MonsterSpell #
+    
+# TODO: Build Speed model for monster speeds

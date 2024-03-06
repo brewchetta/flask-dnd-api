@@ -227,6 +227,13 @@ create_nested_monster_routes_test(
 )
 
 create_nested_monster_routes_test(
+    "speeds", 
+    "Speed", 
+    { "name": "walk", "distance": "60 ft." }, 
+    { "name": "swim", "distance": "30 ft." }
+)
+
+create_nested_monster_routes_test(
     "languages", 
     "Language", 
     { "name": "sylvan" }, 

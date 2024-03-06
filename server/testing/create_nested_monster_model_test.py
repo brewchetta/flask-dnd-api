@@ -116,6 +116,8 @@ create_nested_monster_models_test("SavingThrow", { "name": "dex", "value": 2 }, 
 
 create_nested_monster_models_test("Sense", { "name": "darkvision", "distance": 60 } )
 
+create_nested_monster_models_test("Speed", { "name": "walk", "distance": "60 ft." } )
+
 create_nested_monster_models_test("Language", { "name": "sylvan" } )
 
 create_nested_monster_models_test("Language", { "name": "sylvan" } )

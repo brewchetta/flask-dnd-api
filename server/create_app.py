@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from routes import monster_routes_blueprint, spell_routes_blueprint, create_nested_monster_routes_blueprint
 
-from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
+from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 
 import config
 
@@ -51,6 +51,7 @@ def create_app(mode="DEVELOPMENT"):
     app.register_blueprint( create_nested_monster_routes_blueprint('saving_throws', SavingThrow) )
     app.register_blueprint( create_nested_monster_routes_blueprint('special_abilities', SpecialAbility) )
     app.register_blueprint( create_nested_monster_routes_blueprint('senses', Sense) )
+    app.register_blueprint( create_nested_monster_routes_blueprint('speeds', Speed) )
     app.register_blueprint( create_nested_monster_routes_blueprint('languages', Language) )
     app.register_blueprint( create_nested_monster_routes_blueprint('damage_resistances', DamageResistance) )
     app.register_blueprint( create_nested_monster_routes_blueprint('damage_immunities', DamageImmunity) )

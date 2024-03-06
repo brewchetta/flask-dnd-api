@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
+from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, MonsterSpell
 monster_routes_blueprint = Blueprint('monster_routes_blueprint', __name__)
 from helpers import replace_nested_monster_data, find_monster_by_id, find_spell_by_name, find_spell_by_id, replace_associated_monster_spells
 
@@ -68,6 +68,8 @@ def post_monster():
             replace_nested_monster_data(data['special_abilities'], NEW_M, SpecialAbility, ['name', 'description'])
         if data.get('senses'):
             replace_nested_monster_data(data['senses'], NEW_M, Sense, ['name', 'distance'])
+        if data.get('speeds'):
+            replace_nested_monster_data(data['speeds'], NEW_M, Speed, ['name', 'distance'])
         if data.get('languages'):
             replace_nested_monster_data(data['languages'], NEW_M, Language, ['name'])
         if data.get('damage_resistances'):
@@ -118,6 +120,8 @@ def patch_monster(id):
                 replace_nested_monster_data(data['special_abilities'], m, SpecialAbility, ['name', 'description'])
             if data.get('senses'):
                 replace_nested_monster_data(data['senses'], m, Sense, ['name', 'distance'])
+            if data.get('speeds'):
+                replace_nested_monster_data(data['speeds'], m, Speed, ['name', 'distance'])
             if data.get('languages'):
                 replace_nested_monster_data(data['languages'], m, Language, ['name'])
             if data.get('damage_resistances'):
