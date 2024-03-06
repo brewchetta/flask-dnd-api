@@ -1,2 +1,3 @@
 from .monster_routes import monster_routes_blueprint
+from .spell_routes import spell_routes_blueprint
 from .create_nested_monster_routes_blueprint import create_nested_monster_routes_blueprint

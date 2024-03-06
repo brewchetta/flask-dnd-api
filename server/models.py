@@ -357,7 +357,12 @@ class Action(db.Model, SerializerMixin):
 # # ####################################################
 
 class Spell(db.Model, SerializerMixin):
+    DAMAGE_TYPES = DAMAGE_TYPES
+    SPELL_SCHOOLS = ['abjuration', 'conjuration', 'divination', 'enchantment', 'evocation', 'illusion', 'necromancy', 'transmutation', 'dunamancy']
+
     __tablename__ = "spells_table"
+
+    # COLUMNS #
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -366,6 +371,7 @@ class Spell(db.Model, SerializerMixin):
     casting_time = db.Column(db.String)
     duration = db.Column(db.String)
     range_area = db.Column(db.String)
+    at_higher_levels = db.Column(db.String)
     
     verbal = db.Column(db.Boolean, default=False)
     somatic = db.Column(db.Boolean, default=False)
@@ -374,16 +380,34 @@ class Spell(db.Model, SerializerMixin):
     school = db.Column(db.String)
     attack_save = db.Column(db.String)
     damage_type = db.Column(db.String)
+    effect_type = db.Column(db.String)
+
+    # RELATIONSHIPS #
 
     monster_spells = db.relationship("MonsterSpell", back_populates="spell")
 
+    # SERIALIZER #
+
     serialize_rules = ("-monster_spells",)
 
-    # TODO: Clamp spell schools
-    # TODO: Clamp spell damage types
-    # TODO: Clamp spell attack save types (dex etc.)
+    # VALIDATIONS #
+
+    @validates('damage_type')
+    def validate_damage_type(self, k, v):
+        if v == '' or v == None:
+            return None
+        if v.lower() in self.DAMAGE_TYPES:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) or a null value but got {v}")
+
+    @validates('school')
+    def validate_school(self, k, v):
+        if v.lower() in self.SPELL_SCHOOLS:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid magic school ({ ', '.join(self.SPELL_SCHOOLS) }) but got {v}")
 
 # END Spell #
+
 
 class MonsterSpell(db.Model, SerializerMixin):
     __tablename__ = "monster_spells_table"

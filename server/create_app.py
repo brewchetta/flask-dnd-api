@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from routes import monster_routes_blueprint, create_nested_monster_routes_blueprint
+from routes import monster_routes_blueprint, spell_routes_blueprint, create_nested_monster_routes_blueprint
 
 from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 
@@ -46,6 +46,7 @@ def create_app(mode="DEVELOPMENT"):
         return "Hello world"
     
     app.register_blueprint( monster_routes_blueprint )
+    app.register_blueprint( spell_routes_blueprint )
     app.register_blueprint( create_nested_monster_routes_blueprint('skills', Skill) )
     app.register_blueprint( create_nested_monster_routes_blueprint('saving_throws', SavingThrow) )
     app.register_blueprint( create_nested_monster_routes_blueprint('special_abilities', SpecialAbility) )
