@@ -160,8 +160,8 @@ class Skill(db.Model, SerializerMixin):
 
     @validates('name')
     def validate_skill_name(self, k, v):
-        if v.lower() in self.SKILLS:
-            return v.lower()
+        if v.lower().strip() in self.SKILLS:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid skill name ({ ', '.join(self.SKILLS) }) but got {v}")
     
 # END Skill #
@@ -199,8 +199,8 @@ class SavingThrow(db.Model, SerializerMixin):
     # ##########################################
     @validates('name')
     def validate_skill_name(self, k, v):
-        if v.lower() in self.ABILITIES:
-            return self.ABILITIES_DICT.get(v.lower()) or v.lower()
+        if v.lower().strip() in self.ABILITIES:
+            return self.ABILITIES_DICT.get(v.lower()) or v.lower().strip()
         raise ValueError(f"{k} must be a valid saving throw name ({ ', '.join(self.ABILITIES) }) but got {v}")
 
 # END SavingThrow #
@@ -302,8 +302,8 @@ class DamageResistance(db.Model, SerializerMixin):
 
     @validates("damage_type")
     def validate_damage_type(self, k, v):
-        if v.lower() in self.DAMAGE_TYPES:
-            return v.lower()
+        if v.lower().strip() in self.DAMAGE_TYPES:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
@@ -322,8 +322,8 @@ class DamageImmunity(db.Model, SerializerMixin):
 
     @validates("damage_type")
     def validate_damage_type(self, k, v):
-        if v.lower() in self.DAMAGE_TYPES:
-            return v.lower()
+        if v.lower().strip() in self.DAMAGE_TYPES:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
@@ -341,8 +341,8 @@ class DamageVulnerability(db.Model, SerializerMixin):
 
     @validates("damage_type")
     def validate_damage_type(self, k, v):
-        if v.lower() in self.DAMAGE_TYPES:
-            return v.lower()
+        if v.lower().strip() in self.DAMAGE_TYPES:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
@@ -367,8 +367,8 @@ class ConditionImmunity(db.Model, SerializerMixin):
 
     @validates("condition_type")
     def validate_condition_type(self, k, v):
-        if v.lower() in self.CONDITION_TYPES:
-            return v.lower()
+        if v.lower().strip() in self.CONDITION_TYPES:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid condition type ({ ', '.join(self.CONDITION_TYPES) }) but got {v}")
     
 # END ConditionImmunity #
@@ -444,14 +444,14 @@ class Spell(db.Model, SerializerMixin):
     def validate_damage_type(self, k, v):
         if v == '' or v == None:
             return None
-        if v.lower() in self.DAMAGE_TYPES:
-            return v.lower()
+        if v.lower().strip() in self.DAMAGE_TYPES:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) or a null value but got {v}")
 
     @validates('school')
     def validate_school(self, k, v):
-        if v.lower() in self.SPELL_SCHOOLS:
-            return v.lower()
+        if v.lower().strip() in self.SPELL_SCHOOLS:
+            return v.lower().strip()
         raise ValueError(f"{k} must be a valid magic school ({ ', '.join(self.SPELL_SCHOOLS) }) but got {v}")
 
 # END Spell #
