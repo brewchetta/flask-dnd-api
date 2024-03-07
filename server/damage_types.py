@@ -1,6 +1,7 @@
 DAMAGE_TYPES = [
     'acid', 
-    'bludgeoning','cold', 
+    'bludgeoning',
+    'cold', 
     'fire', 
     'force', 
     'lightning', 
@@ -10,5 +11,7 @@ DAMAGE_TYPES = [
     'psychic', 
     'radiant', 
     'slashing', 
-    'thunder'
+    'thunder',
+    'bludgeoning, piercing, and slashing from nonmagical attacks',
+    'bludgeoning, piercing, and slashing from magical attacks',
 ]
