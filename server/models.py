@@ -91,7 +91,7 @@ class Monster(db.Model, SerializerMixin):
 
     @validates("armor_class", "hit_points", "hit_dice_count", "challenge_rating", "proficiency_bonus")
     def validate_non_zero_stats(self, k, v):
-        if int(v) > 0:
+        if int(v) >= 0:
             return v
         raise ValueError(f"{k} must be 1 or greater but received {v}")
     
@@ -287,13 +287,17 @@ class Language(db.Model, SerializerMixin):
 # # DamageResistance, DamageImmunity, DamageVulnerability 
 # # all require valid damage type
 # # ####################################################
-    
-class DamageModel(db.Model, SerializerMixin):
+
+class DamageResistance(db.Model, SerializerMixin):
     DAMAGE_TYPES = DAMAGE_TYPES
 
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = "damage_resistances_table"
 
+    id = db.Column(db.Integer, primary_key=True)
+    
     damage_type = db.Column(db.String, nullable=False)
+    
+    monster = db.relationship("Monster", back_populates="damage_resistances")
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 
     @validates("damage_type")
@@ -304,17 +308,44 @@ class DamageModel(db.Model, SerializerMixin):
 
     serialize_rules = ("-monster",)
 
-class DamageResistance(DamageModel):
-    __tablename__ = "damage_resistances_table"
-    monster = db.relationship("Monster", back_populates="damage_resistances")
-
-class DamageImmunity(DamageModel):
+class DamageImmunity(db.Model, SerializerMixin):
+    DAMAGE_TYPES = DAMAGE_TYPES
     __tablename__ = "damage_immunities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    damage_type = db.Column(db.String, nullable=False)
+
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
     monster = db.relationship("Monster", back_populates="damage_immunities")
 
-class DamageVulnerability(DamageModel):
+
+    @validates("damage_type")
+    def validate_damage_type(self, k, v):
+        if v.lower() in self.DAMAGE_TYPES:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+
+    serialize_rules = ("-monster",)
+
+class DamageVulnerability(db.Model, SerializerMixin):
+    DAMAGE_TYPES = DAMAGE_TYPES
     __tablename__ = "damage_vulnerabilities_table"
+
+    id = db.Column(db.Integer, primary_key=True)
+    
+    damage_type = db.Column(db.String, nullable=False)
+    
     monster = db.relationship("Monster", back_populates="damage_vulnerabilities")
+    monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
+
+    @validates("damage_type")
+    def validate_damage_type(self, k, v):
+        if v.lower() in self.DAMAGE_TYPES:
+            return v.lower()
+        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+
+    serialize_rules = ("-monster",)
 
 # END DamageModels #
 
