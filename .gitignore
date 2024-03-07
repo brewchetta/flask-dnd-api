@@ -56,3 +56,5 @@ jspm_packages
 
 # pycache
 __pycache__/
+
+beyond_json_data/
