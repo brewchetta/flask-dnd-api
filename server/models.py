@@ -71,6 +71,8 @@ class Monster(db.Model, SerializerMixin):
     spell_slots_eighth_level = db.Column(db.Integer, default=0)
     spell_slots_ninth_level = db.Column(db.Integer, default=0)
 
+    source = db.Column(db.String)
+
     # SERIALIZER #
 
     serialize_rules = ("-skills.monster", "-saving_throws.monster", "-special_abilities.monster", "-senses.monster", "-speeds.monster", "-languages.monster", "-damage_resistances.monster", "-damage_immunities.monster", "-damage_vulnerabilities.monster", "-condition_immunities.monster", "-actions.monster", "-monster_spells", "spells", "-spells.monster_spells")
@@ -419,6 +421,8 @@ class Spell(db.Model, SerializerMixin):
     duration = db.Column(db.String)
     range_area = db.Column(db.String)
     at_higher_levels = db.Column(db.String)
+    ritual = db.Column(db.Boolean, default=False)
+    concentration = db.Column(db.Boolean, default=False)
     
     verbal = db.Column(db.Boolean, default=False)
     somatic = db.Column(db.Boolean, default=False)
@@ -427,6 +431,8 @@ class Spell(db.Model, SerializerMixin):
     school = db.Column(db.String)
     attack_save = db.Column(db.String)
     damage_effect = db.Column(db.String)
+
+    source = db.Column(db.String)
 
     # RELATIONSHIPS #
 
