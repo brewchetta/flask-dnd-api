@@ -405,7 +405,6 @@ class Action(db.Model, SerializerMixin):
 # # ####################################################
 
 class Spell(db.Model, SerializerMixin):
-    DAMAGE_TYPES = DAMAGE_TYPES
     SPELL_SCHOOLS = ['abjuration', 'conjuration', 'divination', 'enchantment', 'evocation', 'illusion', 'necromancy', 'transmutation', 'dunamancy']
 
     __tablename__ = "spells_table"
@@ -427,8 +426,7 @@ class Spell(db.Model, SerializerMixin):
 
     school = db.Column(db.String)
     attack_save = db.Column(db.String)
-    damage_type = db.Column(db.String)
-    effect_type = db.Column(db.String)
+    damage_effect = db.Column(db.String)
 
     # RELATIONSHIPS #
 
@@ -440,13 +438,13 @@ class Spell(db.Model, SerializerMixin):
 
     # VALIDATIONS #
 
-    @validates('damage_type')
-    def validate_damage_type(self, k, v):
-        if v == '' or v == None:
-            return None
-        if v.lower().strip() in self.DAMAGE_TYPES:
-            return v.lower().strip()
-        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) or a null value but got {v}")
+    # @validates('damage_type')
+    # def validate_damage_type(self, k, v):
+    #     if v == '' or v == None:
+    #         return None
+    #     if v.lower().strip() in self.DAMAGE_TYPES:
+    #         return v.lower().strip()
+    #     raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) or a null value but got {v}")
 
     @validates('school')
     def validate_school(self, k, v):
