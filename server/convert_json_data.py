@@ -2,7 +2,7 @@ import os
 import re
 import json
 from create_app import create_app
-from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action
+from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 from helpers import replace_nested_monster_data, replace_associated_monster_spells
 
 DEBUG = True
@@ -17,6 +17,8 @@ with app.app_context():
 
     print("Removing old data")
 
+    MonsterSpell.query.delete()
+    Spell.query.delete()
     Skill.query.delete()
     SavingThrow.query.delete()
     SpecialAbility.query.delete()
@@ -30,10 +32,37 @@ with app.app_context():
     Action.query.delete()
     Monster.query.delete()
 
+    print("Currently registered spells:")
+    print([spell.name for spell in Spell.query.all()])
+
+    path = "./beyond_json_data/spells"
+    dir_list = os.listdir(path)
+    print(f"\nReading all files in {path}...")
+
+    for file_name in dir_list:
+        print(f'\nOpening {file_name}...')
+        with open(f"{path}/{file_name}") as json_file:
+            spell_json = json.load(json_file)
+            print(f" Building {spell_json.get('name') or 'null_spell_name'}")
+
+            filtered_data = { k: v for k, v in spell_json.items() 
+                     if k in Spell.__table__.columns.keys() and k != 'id' }
+            
+            Spell.query.where(Spell.name == filtered_data.get('name')).delete()
+            NEW_S = Spell(**filtered_data)
+            db.session.add(NEW_S)
+
+    debug_print("\nCurrently registered spells:")
+    debug_print([s.name for s in Spell.query.all()])
+
+
+
+
+
     print("Currently registered monsters:")
     print([m.name for m in Monster.query.all()])
 
-    path = "./beyond_json_data"
+    path = "./beyond_json_data/monsters"
     dir_list = os.listdir(path)
     print(f"\nReading all files in {path}...")
 
@@ -59,7 +88,6 @@ with app.app_context():
             filtered_data = { k: v for k, v in monster_json.items() 
                      if k in Monster.__table__.columns.keys() and k != 'id' } 
 
-            # try:
             Monster.query.where(Monster.name == filtered_data.get('name')).delete()
             NEW_M = Monster(**filtered_data)
             db.session.add(NEW_M)
@@ -232,3 +260,10 @@ with app.app_context():
     
     debug_print("\nCurrently registered monsters:")
     debug_print([m.name for m in Monster.query.all()])
+
+    # TODO: Build json converter for spells
+    # TODO: Monster can add spells
+    # TODO: Scraper gets flat proficiency bonus
+    # TODO: Scraper properly gets legendary actions and lair actions
+    # TODO: Scraper gets at will spells that aren't cantrips
+    # TODO: Scraper gets inherent spells (see annis hag)
