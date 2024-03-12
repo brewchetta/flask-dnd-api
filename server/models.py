@@ -99,9 +99,9 @@ class Monster(db.Model, SerializerMixin):
     
     @validates("hit_dice_size")
     def validate_dice_values(self, k, v):
-        if v in [ 4, 6, 8, 10, 12 ]:
+        if v in [ 4, 6, 8, 10, 12, 20 ]:
             return v
-        raise ValueError(f"{k} must be a valid size (4, 6, 8, 10, 12) but received {v}")
+        raise ValueError(f"{k} must be a valid size (4, 6, 8, 10, 12, 20) but received {v}")
     
     @validates("spell_slots_first_level", "spell_slots_second_level", "spell_slots_third_level", "spell_slots_fourth_level", "spell_slots_fifth_level", "spell_slots_sixth_level", "spell_slots_seventh_level", "spell_slots_eighth_level", "spell_slots_ninth_level")
     def validate_spell_slots_sizes(self, k, v):
@@ -324,7 +324,7 @@ class DamageImmunity(db.Model, SerializerMixin):
 
     @validates("damage_type")
     def validate_damage_type(self, k, v):
-        if v.lower().strip() in self.DAMAGE_TYPES:
+        if v.lower().strip() in self.DAMAGE_TYPES or "bludgeoning, piercing, and slashing from" in v.lower().strip():
             return v.lower().strip()
         raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 

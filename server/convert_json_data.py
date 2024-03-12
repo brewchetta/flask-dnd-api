@@ -103,8 +103,8 @@ with app.app_context():
                         new_st = SavingThrow(name=prof_kv[0], value=int(prof_kv[1]), monster=NEW_M)
                         db.session.add(new_st)
                     if "Skill:" in prof:
-                        prof_kv = prof.replace('Skill:', '').strip().split()
-                        new_sk = Skill(name=prof_kv[0], value=int(prof_kv[1]), monster=NEW_M)
+                        prof_kv = prof.replace('Skill:', '').replace('Animal Handling', 'Animal_Handling').strip().split()
+                        new_sk = Skill(name=prof_kv[0].replace("_", " "), value=int(prof_kv[1]), monster=NEW_M)
                         db.session.add(new_sk)
 
             for s in NEW_M.saving_throws:
@@ -134,7 +134,8 @@ with app.app_context():
                     if "passive perception" in sense.lower():
                         NEW_M.passive_perception = int(sense.strip().split(" ")[-1])
                     else:
-                        sense_attrs = sense.lower().strip().split(" ")
+                        sense_attrs = sense.lower().strip().replace("ft.","").split(" ")
+                        print(sense_attrs)
                         s = Sense(name=sense_attrs[0], distance=int(sense_attrs[1]), monster=NEW_M)
                     db.session.add(s)
 
