@@ -302,11 +302,11 @@ class DamageResistance(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="damage_resistances")
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 
-    @validates("damage_type")
-    def validate_damage_type(self, k, v):
-        if v.lower().strip() in self.DAMAGE_TYPES:
-            return v.lower().strip()
-        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+    # @validates("damage_type")
+    # def validate_damage_type(self, k, v):
+    #     if v.lower().strip() in self.DAMAGE_TYPES or 'bludgeoning, piercing, and slashing from' in v.lower().strip():
+    #         return v.lower().strip()
+    #     raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
 
@@ -322,11 +322,11 @@ class DamageImmunity(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="damage_immunities")
 
 
-    @validates("damage_type")
-    def validate_damage_type(self, k, v):
-        if v.lower().strip() in self.DAMAGE_TYPES or "bludgeoning, piercing, and slashing from" in v.lower().strip():
-            return v.lower().strip()
-        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+    # @validates("damage_type")
+    # def validate_damage_type(self, k, v):
+    #     if v.lower().strip() in self.DAMAGE_TYPES or "bludgeoning, piercing, and slashing from" in v.lower().strip():
+    #         return v.lower().strip()
+    #     raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
 
@@ -341,11 +341,11 @@ class DamageVulnerability(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="damage_vulnerabilities")
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
 
-    @validates("damage_type")
-    def validate_damage_type(self, k, v):
-        if v.lower().strip() in self.DAMAGE_TYPES:
-            return v.lower().strip()
-        raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
+    # @validates("damage_type")
+    # def validate_damage_type(self, k, v):
+    #     if v.lower().strip() in self.DAMAGE_TYPES:
+    #         return v.lower().strip()
+    #     raise ValueError(f"{k} must be a valid damage type ({ ', '.join(self.DAMAGE_TYPES) }) but got {v}")
 
     serialize_rules = ("-monster",)
 

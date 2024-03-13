@@ -78,6 +78,8 @@ with app.app_context():
             monster_json['hit_dice_size'] = int(monster_json.get('hit_dice').strip().split('d')[1])
             if monster_json['hit_dice_size'] == 1:
                 monster_json['hit_dice_size'] == 10
+            if monster_json['challenge_rating'] == "1/8":
+                monster_json['challenge_rating'] = 0.125
             if monster_json['challenge_rating'] == "1/4":
                 monster_json['challenge_rating'] = 0.25
             if monster_json['challenge_rating'] == "1/2":
@@ -103,7 +105,7 @@ with app.app_context():
                         new_st = SavingThrow(name=prof_kv[0], value=int(prof_kv[1]), monster=NEW_M)
                         db.session.add(new_st)
                     if "Skill:" in prof:
-                        prof_kv = prof.replace('Skill:', '').replace('Animal Handling', 'Animal_Handling').strip().split()
+                        prof_kv = prof.replace('Skill:', '').replace('Animal Handling', 'Animal_Handling').replace('Sleight of Hand', 'Sleight_of_Hand').strip().split()
                         new_sk = Skill(name=prof_kv[0].replace("_", " "), value=int(prof_kv[1]), monster=NEW_M)
                         db.session.add(new_sk)
 
