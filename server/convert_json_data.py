@@ -7,22 +7,33 @@ from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed
 from helpers import replace_nested_monster_data, replace_associated_monster_spells
 
 DEBUG = True
+LOG = True
 
 total_errors = 0
+error_entities = []
+
+if LOG:
+    path = "./beyond_json_data/log.txt"
+    with open(path, 'a') as log_file:
+        timestamp = str(datetime.now())
+        log_file.write(f"\n\n------Starting new attempt at {timestamp}------\n\n")
+
 
 def debug_print(*args):
     if DEBUG:
         print(*args)
-
+    
 
 def log_error(error:Exception, entity:str=''):
-    global total_errors
-    total_errors += 1
-    path = "./beyond_json_data/log.txt"
-    with open(path, 'a') as log_file:
-        timestamp = str(datetime.now())
-        error_string = repr(error)
-        log_file.write(f"Error {total_errors}: {timestamp} - {entity or 'unknown'}\n    {error_string}\n\n")
+    if LOG:
+        error_entities.append(entity)
+        global total_errors
+        total_errors += 1
+        path = "./beyond_json_data/log.txt"
+        with open(path, 'a') as log_file:
+            timestamp = str(datetime.now())
+            error_string = repr(error)
+            log_file.write(f"Error {total_errors}: {timestamp} - {entity or 'unknown'}\n    {error_string}\n\n")
 
 
 app = create_app()
@@ -278,17 +289,19 @@ with app.app_context():
             # if monster_json.get('spells'):
             #     replace_associated_monster_spells(monster_json['spells'], NEW_M)
 
-            # except Exception as e:
-            #     print(f"ERROR: {e}")
-                
-            # import ipdb; ipdb.set_trace()
-
         except Exception as e:
             print("\n---Error encountered - adding to log.txt---\n")
             log_error(error=e, entity=file_name)
 
     debug_print("\nCurrently registered monsters:")
     debug_print([m.name for m in Monster.query.all()])
+
+if LOG:
+    path = "./beyond_json_data/log.txt"
+    with open(path, 'a') as log_file:
+        timestamp = str(datetime.now())
+        log_file.write(f"\nError files: {' '.join(error_entities)}")
+        log_file.write(f"\n\n------Ending attempt at {timestamp}------\n\n")
 
     # TODO: Build json converter for spells
     # TODO: Monster can add spells
