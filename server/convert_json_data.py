@@ -300,7 +300,8 @@ if LOG:
     path = "./beyond_json_data/log.txt"
     with open(path, 'a') as log_file:
         timestamp = str(datetime.now())
-        log_file.write(f"\nError files: {' '.join(error_entities)}")
+        if len( error_entities ) > 0:
+            log_file.write(f"\nError files: {' '.join(error_entities)}")
         log_file.write(f"\n\n------Ending attempt at {timestamp}------\n\n")
 
     # TODO: Build json converter for spells
