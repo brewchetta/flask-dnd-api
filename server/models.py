@@ -105,7 +105,7 @@ class Monster(db.Model, SerializerMixin):
     
     @validates("spell_slots_first_level", "spell_slots_second_level", "spell_slots_third_level", "spell_slots_fourth_level", "spell_slots_fifth_level", "spell_slots_sixth_level", "spell_slots_seventh_level", "spell_slots_eighth_level", "spell_slots_ninth_level")
     def validate_spell_slots_sizes(self, k, v):
-        if v in [0,1,2,3,4]:
+        if v in [0,1,2,3,4,5,6]:
             return v
         raise ValueError(f"{k} must be a valid size (0-4) but received {v}")
     
