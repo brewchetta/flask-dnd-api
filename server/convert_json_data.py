@@ -296,13 +296,15 @@ with app.app_context():
     debug_print("\nCurrently registered monsters:")
     debug_print([m.name for m in Monster.query.all()])
 
-if LOG:
-    path = "./beyond_json_data/log.txt"
-    with open(path, 'a') as log_file:
-        timestamp = str(datetime.now())
-        if len( error_entities ) > 0:
-            log_file.write(f"\nError files: {' '.join(error_entities)}")
-        log_file.write(f"\n\n------Ending attempt at {timestamp}------\n\n")
+    if LOG:
+        path = "./beyond_json_data/log.txt"
+        with open(path, 'a') as log_file:
+            timestamp = str(datetime.now())
+            if len( error_entities ) > 0:
+                log_file.write(f"\nError files: {' '.join(error_entities)}")
+            log_file.write(f"\nSpells: {len(Spell.query.all())}")
+            log_file.write(f"\nMonsters: {len(Monster.query.all())}")
+            log_file.write(f"\n\n------Ending attempt at {timestamp}------\n\n")
 
     # TODO: Build json converter for spells
     # TODO: Monster can add spells
