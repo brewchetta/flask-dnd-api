@@ -44,6 +44,23 @@ def replace_nested_monster_data(data, parent, child_class, valid_attributes):
         new_items.append(new_item)
     return new_item
 
+
+# append_nested_monster_data #################
+# params: data:list[dict], parent:Monster, 
+# child_class:class, valid_attributes:list[str]
+# 
+# return list[child_class_instance]
+# ###########################################
+def append_nested_monster_data(data:list, parent:Monster, child_class, valid_attributes:list):
+    new_items = []
+    for item_dict in data:
+        filtered_item_dict = { k: v for k, v in item_dict.items() if k in valid_attributes }
+        new_item = child_class(**filtered_item_dict)
+        new_item.monster = parent
+        db.session.add(new_item)
+        new_items.append(new_item)
+    return new_item
+
 # replace_associated_monster_spells #################
 # params: spell_names:list[str], parent:Monster, 
 # 
