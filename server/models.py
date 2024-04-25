@@ -390,6 +390,8 @@ class Action(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     legendary_action = db.Column(db.Boolean, default=False)
     lair_action = db.Column(db.Boolean, default=False)
+    bonus_action = db.Column(db.Boolean, default=False)
+    reaction = db.Column(db.Boolean, default=False)
     name = db.Column(db.String)
     description = db.Column(db.String, nullable=False)
     monster_id = db.Column(db.Integer, db.ForeignKey("monsters_table.id"))
@@ -397,7 +399,9 @@ class Action(db.Model, SerializerMixin):
 
     serialize_rules = ("-monster",)
 
-    # TODO: actions should also have a flag for bonus action / reaction
+    @validates('name', 'description')
+    def sanitize_name_and_description(self, k, v):
+        return v.strip()
     
 # END Action #
 

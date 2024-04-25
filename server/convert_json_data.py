@@ -4,9 +4,9 @@ import json
 from datetime import datetime
 from create_app import create_app
 from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
-from helpers import replace_nested_monster_data, replace_associated_monster_spells
+from helpers import replace_nested_monster_data, append_nested_monster_data, replace_associated_monster_spells
 
-DEBUG = True
+DEBUG = False
 LOG = True
 
 total_errors = 0
@@ -57,8 +57,8 @@ with app.app_context():
     Action.query.delete()
     Monster.query.delete()
 
-    print("Currently registered spells:")
-    print([spell.name for spell in Spell.query.all()])
+    debug_print("Currently registered spells:")
+    debug_print([spell.name for spell in Spell.query.all()])
 
     path = "./beyond_json_data/spells"
     dir_list = os.listdir(path)
@@ -69,7 +69,7 @@ with app.app_context():
             print(f'\nOpening {file_name}...')
             with open(f"{path}/{file_name}") as json_file:
                 spell_json = json.load(json_file)
-                print(f" Building {spell_json.get('name') or 'null_spell_name'}")
+                debug_print(f" Building {spell_json.get('name') or 'null_spell_name'}")
 
                 filtered_data = { k: v for k, v in spell_json.items() 
                         if k in Spell.__table__.columns.keys() and k != 'id' }
@@ -92,8 +92,8 @@ with app.app_context():
 
 
 
-    print("Currently registered monsters:")
-    print([m.name for m in Monster.query.all()])
+    debug_print("Currently registered monsters:")
+    debug_print([m.name for m in Monster.query.all()])
 
     path = "./beyond_json_data/monsters"
     dir_list = os.listdir(path)
@@ -173,7 +173,7 @@ with app.app_context():
                             NEW_M.passive_perception = int(sense.strip().split(" ")[-1])
                         else:
                             sense_attrs = sense.lower().strip().replace("ft.","").split(" ")
-                            print(sense_attrs)
+                            debug_print(sense_attrs)
                             s = Sense(name=sense_attrs[0], distance=int(sense_attrs[1]), monster=NEW_M)
                         db.session.add(s)
 
@@ -215,6 +215,23 @@ with app.app_context():
 
                 for s in NEW_M.actions:
                     debug_print(f"  action - {s.name}: {s.description}")
+
+                # REACTIONS
+
+                if monster_json.get('reactions'):
+                    for act in monster_json['reactions']:
+                        act['description'] = act['desc']
+                        if 'spellcasting ability is' in act['description'].lower():
+                            match = re.search("spellcasting ability is (\w+)", act['description'])
+                            NEW_M.spellcasting_ability = match.group(1)
+                        if 'as the spellcasting ability' in act['description'].lower():
+                            match = re.search("(\w+) as the spellcasting ability", act['description'])
+                            NEW_M.spellcasting_ability = match.group(1)
+                        act['reaction'] = True
+                    append_nested_monster_data(monster_json['reactions'], NEW_M, Action, ['name', 'description', 'reaction'])
+
+                for s in NEW_M.actions:
+                    debug_print(f"  reaction - {s.name}: {s.description}")
 
                 # DAMAGE RESISTANCES
 
