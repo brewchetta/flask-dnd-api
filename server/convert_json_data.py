@@ -86,6 +86,10 @@ with app.app_context():
 
 
 
+    debug_print("Committing spells to db")
+    db.session.commit()
+
+
 
 
     print("Currently registered monsters:")
@@ -286,12 +290,16 @@ with app.app_context():
     
 
 
-            # if monster_json.get('spells'):
-            #     replace_associated_monster_spells(monster_json['spells'], NEW_M)
+            if monster_json.get('spells'):
+                monster_spell_names = [ spell['name'] for spell in monster_json['spells'] ]
+                replace_associated_monster_spells(monster_spell_names, NEW_M)
 
         except Exception as e:
             print("\n---Error encountered - adding to log.txt---\n")
             log_error(error=e, entity=file_name)
+
+    debug_print("Committing monsters to db")
+    db.session.commit()
 
     debug_print("\nCurrently registered monsters:")
     debug_print([m.name for m in Monster.query.all()])
@@ -306,8 +314,7 @@ with app.app_context():
             log_file.write(f"\nMonsters: {len(Monster.query.all())}")
             log_file.write(f"\n\n------Ending attempt at {timestamp}------\n\n")
 
-    # TODO: Build json converter for spells
-    # TODO: Monster can add spells
+    # TODO: Converter adds monster reactions / bonus actions
     # TODO: Scraper gets flat proficiency bonus
     # TODO: Scraper properly gets legendary actions and lair actions
     # TODO: Scraper gets at will spells that aren't cantrips
