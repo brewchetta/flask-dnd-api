@@ -396,6 +396,8 @@ class Action(db.Model, SerializerMixin):
     monster = db.relationship("Monster", back_populates="actions")
 
     serialize_rules = ("-monster",)
+
+    # TODO: actions should also have a flag for bonus action / reaction
     
 # END Action #
 
@@ -476,4 +478,4 @@ class MonsterSpell(db.Model, SerializerMixin):
 
 # END MonsterSpell #
     
-# TODO: Build Speed model for monster speeds
+# TODO: Build Speed model for monster speeds OR add column for speeds
