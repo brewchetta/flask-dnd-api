@@ -1,0 +1,58 @@
+// --- CHECKBOX ------------------------------------------------------------//
+
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  color: $checkbox-color;
+  cursor: pointer;
+  width: $checkbox-size;
+  height: $checkbox-size;
+  border: $checkbox-border-width solid currentColor;
+  transform: translateY(0.3em);
+  position: relative;
+  background-size: contain;
+  background-position: left;
+
+  /* --- WITH CUSTOM BOX --- */
+
+  &.boxmark::before {
+    display: block;
+    content: "";
+    width: $checkbox-mark-size;
+    height: $checkbox-mark-size;
+    transform: scale(0) translateX(-50%) translateY(-50%);
+    background-color: currentColor;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+
+  &.boxmark:checked::before {
+    transform: scale(1) translateX(-50%) translateY(-50%);
+    transition: color 0.3s;
+  }
+
+  /* --- DISABLED & LABEL TEXT --- */
+
+  &:disabled {
+    cursor: default;
+    filter: contrast(0);
+  }
+
+  & + label {
+    color: $checkbox-color;
+  }
+
+  &:disabled + label {
+    filter: contrast(0);
+  }
+
+}
+
+// --- CROSSED OUT CHECKBOX ------------------------------------------------//
+
+.crossable-checkbox input[type="checkbox"] {
+  &:checked + label {
+    text-decoration: line-through;
+  }
+}

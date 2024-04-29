@@ -1,0 +1,26 @@
+// --- BACKGROUNDS -------------------------------------------------------//
+
+// --- BACKGROUND COLORS -------------------------------------------------//
+
+@each $name, $value in $colors {
+  .background-#{$name} {
+    background-color: $value;
+  }
+}
+
+// --- SPECIALTY BACKGROUNDS --------------------------------------------//
+
+/* PLACEABLE IMAGE BACKGROUND */
+
+@mixin image-background-mixin($url, $position, $size: 50%) {
+  @include small-screen-only {
+    background-image: url($url);;
+    background-repeat: no-repeat;
+    background-size: $size;
+    background-position: $position;
+  }
+}
+
+// .some-image-background {
+//   @include image-background-mixin('../assets/images/some-image.png', bottom center);
+// }

@@ -1,0 +1,36 @@
+// --- FORMATTING ---------------------------------------------------------//
+
+/* (margins, padding, spacing, etc) */
+
+@mixin padding-and-margin($name, $size) {
+  .padding-#{$name} {
+    padding: $size;
+  }
+
+  .padding-horizontal-#{$name} {
+    padding-left: $size;
+    padding-right: $size;
+  }
+
+  .padding-vertical-#{$name} {
+    padding-top: $size;
+    padding-bottom: $size;
+  }
+
+  .margin-#{$name} {
+    margin: $size;
+  }
+  .margin-horizontal-#{$name} {
+    margin-left: $size;
+    margin-right: $size;
+  }
+
+  .margin-vertical-#{$name} {
+    margin-top: $size;
+    margin-bottom: $size;
+  }
+}
+
+@each $name, $size in $spacings {
+  @include padding-and-margin($name, $size);
+}

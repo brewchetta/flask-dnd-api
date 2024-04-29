@@ -1,0 +1,22 @@
+// --- BODY AND GENERAL STYLINGS ----------------------------------------- //
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: $main-font;
+  padding: $body-padding;
+  min-height: 90vh;
+}
+
+.App {
+  min-height: 90vh;
+}
+
+li {
+  list-style: $list-style;
+}
+
+input, select {
+  font-family: inherit;
+}

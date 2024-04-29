@@ -1,0 +1,75 @@
+// --- TEXT ------------------------------------------------------------//
+
+// --- COLOR MIXIN ------------------------------------------------------//
+
+@mixin text-colored($color) {
+  color: $color;
+
+  &:link {
+    color: $color;
+  }
+
+  &:visited {
+    color: $color;
+  }
+
+  &:active {
+    color: $color;
+  }
+}
+
+
+// --- TEXT FORMATTING ---------------------------------------------------//
+
+.italic {
+  font-style: italic;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.crossed-out {
+  text-decoration: line-through;
+}
+
+.underlined {
+  text-decoration: underline;
+}
+
+.overlined {
+  text-decoration: overline;
+}
+
+.no-decoration {
+  text-decoration: none;
+}
+
+
+// --- TEXT COLORS ------------------------------------------------------//
+
+@each $color-name, $color-value in $colors {
+  .text-#{$color-name} {
+    @include text-colored($color-value);
+  }
+}
+
+
+// --- TEXT FONTS ------------------------------------------------------//
+
+@each $font-name, $font-value in $fonts {
+  .#{$font-name} {
+    font-family: $font-value;
+  }
+}
+
+
+// --- TEXT SIZES ------------------------------------------------------//
+
+.text-small {
+  font-size: $text-small;
+}
+
+.text-small {
+  font-size: $text-large;
+}
