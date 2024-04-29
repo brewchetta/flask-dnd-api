@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from routes import monster_routes_blueprint, spell_routes_blueprint, create_nested_monster_routes_blueprint
 
 from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Speed, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
@@ -35,6 +36,8 @@ def create_app(mode="DEVELOPMENT"):
     migrate = Migrate(app, db)
 
     db.init_app(app)
+
+    CORS(app)
 
 
 
