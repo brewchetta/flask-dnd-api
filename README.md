@@ -1,5 +1,17 @@
 # DnD Free Monster API
 
+## Local Installation
+
+The local server uses pipenv to create a virtual environment. You may also install files globally using pip.
+
+```
+pipenv install
+pipenv shell
+cd server
+flask db upgrade
+flask run
+```
+
 ## Converting JSON Data
 
 Place monster JSON files inside a `server/beyond_json_data/mosnters` and spells inside `server/beyond_json_data/spells`.
