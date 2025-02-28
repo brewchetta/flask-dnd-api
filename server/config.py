@@ -18,7 +18,7 @@ class ProductionConfig(Config):
 
 # DEVELOPMENT #
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///app.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI') or "sqlite:///app.db"
 
 # TESTING #
 class TestingConfig(Config):
