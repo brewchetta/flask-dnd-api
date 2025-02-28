@@ -1,41 +1,109 @@
-# DnD Free Monster API
+# D&D Monster API
 
-## Local Installation
+This is a RESTful Flask API that can be populated with Dungeons & Dragons monsters and spells. This application does not come with an associated database or monster/spell data, it will be up to the user to populate data based on official D&D content, rulebooks, or their own custom content.
 
-The local server uses pipenv to create a virtual environment. You may also install files globally using pip.
+## Contents
+
+- [Local Installation](#local-installation)
+    - [ENV](#env)
+    - [With Pipenv](#with-pipenv)
+    - [With Pip](#with-pip)
+- [Usage](#usage)
+    - [Endpoints](#endpoints)
+- [Converting JSON Data](#converting-json-data)
+    - [Limitations](#limitations)
+    - [JSON Examples](#json-examples)
+- [Contributing](#contributing)
+
+## Local Installation 
+
+### ENV
+
+You will need the following variables to use this application:
+
+```
+FLASK_ENV=PRODUCTION/DEVELOPMENT/TEST
+DATABASE_URI=your-postgresql-db-here
+```
+
+By default the `FLASK_ENV` will be set to `DEVELOPMENT` and the `DATABASE_URI` will only get used in `PRODUCTION` mode.
+
+The `DEVELOPMENT` database defaults to a local `sqlite` database.
+
+### With Pipenv
+
+The local server uses pipenv to create a virtual environment. This is preferred in order to not clutter the global space.
 
 ```
 pipenv install
 pipenv shell
+
 cd server
 flask db upgrade
 flask run
 ```
 
+## With Pip
+
+You may also install files globally using pip.
+
+```
+pip install SQLAlchemy, flask, flask-sqlalchemy, flask-migrate, pytest, importlib-metadata, importlib-resources, sqlalchemy-serializer, flask-cors, psycopg2-binary
+
+cd server
+flask db upgrade
+flask run
+```
+
+## Usage
+
+You can start the server with `flask run`. By default the application is served on `127.0.0.1:5000`.
+
+### Endpoints
+
+The majority of endpoints can be accessed with `GET`, `POST`, `PATCH`, and `DELETE` methods.
+
+```
+/monsters
+/monsters/:id
+/monsters/:id/spells
+/monsters/:id/skills
+/monsters/:id/saving_throws
+/monsters/:id/special_abilities
+/monsters/:id/senses
+/monsters/:id/speeds
+/monsters/:id/languages
+/monsters/:id/damage_resistances
+/monsters/:id/damage_immunities
+/monsters/:id/damage_vulnerabilities
+/monsters/:id/condition_immunities
+/monsters/:id/actions
+/spells
+```
+
 ## Converting JSON Data
 
-Place monster JSON files inside a `server/beyond_json_data/mosnters` and spells inside `server/beyond_json_data/spells`.
+Place monster JSON files inside a `server/beyond_json_data/monsters` and spells inside `server/beyond_json_data/spells`.
 
-Example monster:
+An example of the file structure:
 
-```json
-{"index":"abjurer","name":"Abjurer","size":"Medium","type":"Humanoid","subtype":"Any Race","alignment":" Any Alignment","armor_class":12,"hit_points":84,"hit_dice":"13d8","speed":{"walk":"30 ft."},"strength":9,"dexterity":14,"constitution":14,"intelligence":18,"wisdom":12,"charisma":11,"spells":[{"name":"blade ward","level":0},{"name":"dancing lights","level":0},{"name":"mending","level":0},{"name":"message","level":0},{"name":"ray of frost","level":0},{"name":"alarm","level":1},{"name":"mage armor","level":1},{"name":"magic missile","level":1},{"name":"shield","level":1},{"name":"arcane lock","level":2},{"name":"invisibility","level":2},{"name":"counterspell","level":3},{"name":"dispel magic","level":3},{"name":"fireball","level":3},{"name":"banishment","level":4},{"name":"stoneskin","level":4},{"name":"cone of cold","level":5},{"name":"wall of force","level":5},{"name":"flesh to stone","level":6},{"name":"globe of invulnerability","level":6},{"name":"symbol","level":7},{"name":"teleport","level":7}],"spell_slots":{"1":4,"2":3,"3":3,"4":3,"5":2,"6":1,"7":1},"url":"https://www.dndbeyond.com/monsters","source":"Volo's Guide to Monsters","proficiencies":"Saving Throw: INT +8 | Saving Throw: WIS +5 | Skill: Arcana +8 | Skill: History +8","senses":"Passive Perception 11","languages":"any four languages","challenge_rating":"9","xp":5000,"spell_modifier":8,"spell_dc":16,"special_abilities":[{"name":"Spellcasting.","desc":" The abjurer is a 13th-level spellcaster. Its spellcasting ability is Intelligence (spell save DC 16, +8 to hit with spell attacks). The abjurer has the following wizard spells prepared:"},{"name":"Arcane Ward.","desc":" The abjurer has a magical ward that has 30 hit points. Whenever the abjurer takes damage, the ward takes the damage instead. If the ward is reduced to 0 hit points, the abjurer takes any remaining damage. When the abjurer casts an abjuration spell of 1st level or higher, the ward regains a number of hit points equal to twice the level of the spell."}],"actions":[{"name":"QuarterstaffMelee Weapon Attack:","desc":" +3 to hit, reach 5 ft., one target. Hit: 2 (1d6 − 1) bludgeoning damage, or 3 (1d8 − 1) bludgeoning damage if used with two hands."}]}
+```
+├── server
+|   ├── beyond_json_data
+|   │   ├── monsters
+|   │   │   └── abjurer.json
+|   │   └── spells
+|   │       └── acid-splash.json
 ```
 
-Example spell:
-
-```json
-{"index":"acid-splash","name":"Acid Splash","description":"You hurl a bubble of acid. Choose one or two creatures you can see within range. If you choose two, they must be within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d6 acid damage.\nThis spell’s damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).\n","level":0,"casting_time":"1 Action","ritual":false,"duration":"Instantaneous","concentration":false,"range_area":"60 ft","verbal":true,"somatic":true,"school":"Conjuration","attack_save":"DEX Save","damage_effect":"Acid","source":"Basic Rules, pg. 211","url":"https://www.dndbeyond.com/spells/acid-splash"}
-```
-
-In order to add the data to the database:
+In order to add the data to the database you may use the `convert_json_data` script:
 
 ```bash
 cd server
 python convert_json_data.py
 ```
 
-Inside `convert_json_data.py` there are two constants that can be changed:
+Inside `convert_json_data.py` there are two variables that can be changed for improved usability:
 
 ```python
 DEBUG = True
@@ -45,4 +113,16 @@ LOG = True
 # toggle to write errors into the log.txt file in beyond_json_data folder
 ```
 
-Conversion will first remove all data before seeding the database. Will attempt to seed spells first followed by monsters and create relational data between spells and monsters if able.
+Conversion will first remove all data before adding to the database. The script will attempt to seed spells first followed by monsters and create relational data between spells and monsters if able.
+
+### JSON Examples
+
+You may find an example monster in [abjurer.json](examples/abjurer.json) and an example spell in [acid-splash.json](examples/acid-splash.json).
+
+### Limitations
+
+The conversion script currently does not account for bonus actions and reactions. This will be fixed in an update.
+
+## Contributing
+
+Check out our `CONTRIBUTING.md`. For issues please remember to be kind and follow what you'd expect from general community guidelines.

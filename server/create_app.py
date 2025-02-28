@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -17,7 +18,7 @@ import config
 # environment
 # ##############################################
 
-def create_app(mode="DEVELOPMENT"):
+def create_app(mode=os.environ.get('FLASK_ENV') or "DEVELOPMENT"):
 
     app = Flask(__name__)
     if mode == "PRODUCTION":

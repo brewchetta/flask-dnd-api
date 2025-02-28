@@ -4,10 +4,7 @@ from app import app
 from models import db, Monster, Skill, SavingThrow, SpecialAbility, Sense, Language, DamageResistance, DamageImmunity, DamageVulnerability, ConditionImmunity, Action, Spell, MonsterSpell
 from testing.test_monsters import MONSTER_ONE, MONSTER_TWO, MONSTER_THREE, MONSTER_FOUR, MONSTER_FIVE
 from damage_types import DAMAGE_TYPES
-from faker import Faker
 import random
-
-faker = Faker()
 
 if __name__ == '__main__':
     with app.app_context():

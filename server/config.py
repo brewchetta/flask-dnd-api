@@ -5,6 +5,8 @@
 # object class
 # ###########################################
 
+import os
+
 # DEFAULT #
 class Config(object):
     TESTING = False
@@ -12,7 +14,7 @@ class Config(object):
 
 # PRODUCTION #
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = '????'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
 
 # DEVELOPMENT #
 class DevelopmentConfig(Config):
