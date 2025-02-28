@@ -58,3 +58,5 @@ jspm_packages
 __pycache__/
 
 beyond_json_data/
+
+.env
