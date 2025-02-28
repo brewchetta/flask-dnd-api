@@ -1,6 +1,4 @@
-FROM PYTHON:latest
-# TODO: double check python version
-# TODO: see if pip needs to be added
+FROM PYTHON:3
 
 COPY /server/routes/ /app/
 COPY /server/app.py /app/
@@ -13,7 +11,7 @@ COPY /requirements.txt /app/
 
 WORKDIR /app
 
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
 RUN pip install gunicorn
 
 CMD ["gunicorn", "app:app"]
